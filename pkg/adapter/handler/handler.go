@@ -1,6 +1,10 @@
 package handler
 
-type Handler struct{}
+import "github.com/yudai2929/task-app/pkg/usecase"
+
+type Handler struct {
+	au usecase.AuthUsecase
+}
 
 func NewHandler() *Handler {
 	return &Handler{}

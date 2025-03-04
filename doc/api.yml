@@ -53,6 +53,9 @@ paths:
                     $ref: "#/components/schemas/User"
                   jwt:
                     type: string
+                required:
+                  - jwt
+                  - user
         default:
           description: Error
           content:
@@ -90,6 +93,8 @@ paths:
                 properties:
                   jwt:
                     type: string
+                required:
+                  - jwt
         default:
           description: Error
           content:
