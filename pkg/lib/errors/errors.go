@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"runtime/debug"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/yudai2929/task-app/database/gen"
 	"github.com/yudai2929/task-app/pkg/lib/errors/codes"
 )
@@ -66,13 +67,18 @@ func Convert(err error) error {
 		return Newf(converted.code, "%s", converted.origin.Error())
 	}
 
-	fmt.Printf("%+v\n", err)
-	if errors.Is(err, gen.ErrAlreadyExists) {
-		return Newf(codes.CodeAlreadyExists, "%s", err.Error())
-	} else if errors.Is(err, gen.ErrDoesNotExist) {
-		return Newf(codes.CodeNotFound, "%s", err.Error())
-	} else if errors.Is(err, sql.ErrNoRows) {
-		return Newf(codes.CodeNotFound, "%s", err.Error())
+	var v10Err validator.ValidationErrors
+	if errors.As(err, &v10Err) {
+		converted.code = codes.CodeInvalidArgument
+		return converted
 	}
-	return Newf(codes.CodeUnknown, "%s", err.Error())
+
+	if errors.Is(err, gen.ErrAlreadyExists) {
+		converted.code = codes.CodeAlreadyExists
+	} else if errors.Is(err, gen.ErrDoesNotExist) {
+		converted.code = codes.CodeNotFound
+	} else if errors.Is(err, sql.ErrNoRows) {
+		converted.code = codes.CodeNotFound
+	}
+	return converted
 }

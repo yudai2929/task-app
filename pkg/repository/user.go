@@ -27,6 +27,7 @@ func (r *userRepository) CreateUser(ctx context.Context, user *entity.User) erro
 		Name:         user.Name,
 	}
 	if err := u.Insert(ctx, r.db); err != nil {
+		return errors.Convert(err)
 	}
 	return nil
 }

@@ -43,5 +43,4 @@ func TestUserRepository_CRUD(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, user)
 	require.Equal(t, "id", user.ID)
-
 }
