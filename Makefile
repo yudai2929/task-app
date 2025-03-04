@@ -17,5 +17,10 @@ up:
 down:
 	docker compose down
 
+
+reset:
+	@docker compose down
+	@docker volume rm task-app_postgres_data
+
 psql:
-	docker exec -it postgres_db psql -U user -d task_db
+	docker exec -it postgres_db psql -U postgres -d postgres
