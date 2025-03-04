@@ -5,13 +5,11 @@ package gen
 import (
 	"context"
 	"database/sql"
-
-	"github.com/google/uuid"
 )
 
 // User represents a row from 'public.users'.
 type User struct {
-	ID           uuid.UUID    `json:"id"`            // id
+	ID           string       `json:"id"`            // id
 	Name         string       `json:"name"`          // name
 	Email        string       `json:"email"`         // email
 	PasswordHash string       `json:"password_hash"` // password_hash
@@ -187,7 +185,7 @@ func UserByEmail(ctx context.Context, db DB, email string) (*User, error) {
 // UserByID retrieves a row from 'public.users' as a [User].
 //
 // Generated from index 'users_pkey'.
-func UserByID(ctx context.Context, db DB, id uuid.UUID) (*User, error) {
+func UserByID(ctx context.Context, db DB, id string) (*User, error) {
 	// query
 	const sqlstr = `SELECT ` +
 		`id, name, email, password_hash, created_at, updated_at ` +

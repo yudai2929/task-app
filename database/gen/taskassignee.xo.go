@@ -5,15 +5,13 @@ package gen
 import (
 	"context"
 	"database/sql"
-
-	"github.com/google/uuid"
 )
 
 // TaskAssignee represents a row from 'public.task_assignees'.
 type TaskAssignee struct {
-	ID         uuid.UUID    `json:"id"`          // id
-	TaskID     uuid.UUID    `json:"task_id"`     // task_id
-	UserID     uuid.UUID    `json:"user_id"`     // user_id
+	ID         string       `json:"id"`          // id
+	TaskID     string       `json:"task_id"`     // task_id
+	UserID     string       `json:"user_id"`     // user_id
 	AssignedAt sql.NullTime `json:"assigned_at"` // assigned_at
 	CreatedAt  sql.NullTime `json:"created_at"`  // created_at
 	UpdatedAt  sql.NullTime `json:"updated_at"`  // updated_at
@@ -133,7 +131,7 @@ func (ta *TaskAssignee) Delete(ctx context.Context, db DB) error {
 // TaskAssigneesByTaskID retrieves a row from 'public.task_assignees' as a [TaskAssignee].
 //
 // Generated from index 'idx_task_assignees_task_id'.
-func TaskAssigneesByTaskID(ctx context.Context, db DB, taskID uuid.UUID) ([]*TaskAssignee, error) {
+func TaskAssigneesByTaskID(ctx context.Context, db DB, taskID string) ([]*TaskAssignee, error) {
 	// query
 	const sqlstr = `SELECT ` +
 		`id, task_id, user_id, assigned_at, created_at, updated_at ` +
@@ -167,7 +165,7 @@ func TaskAssigneesByTaskID(ctx context.Context, db DB, taskID uuid.UUID) ([]*Tas
 // TaskAssigneesByUserID retrieves a row from 'public.task_assignees' as a [TaskAssignee].
 //
 // Generated from index 'idx_task_assignees_user_id'.
-func TaskAssigneesByUserID(ctx context.Context, db DB, userID uuid.UUID) ([]*TaskAssignee, error) {
+func TaskAssigneesByUserID(ctx context.Context, db DB, userID string) ([]*TaskAssignee, error) {
 	// query
 	const sqlstr = `SELECT ` +
 		`id, task_id, user_id, assigned_at, created_at, updated_at ` +
@@ -201,7 +199,7 @@ func TaskAssigneesByUserID(ctx context.Context, db DB, userID uuid.UUID) ([]*Tas
 // TaskAssigneeByID retrieves a row from 'public.task_assignees' as a [TaskAssignee].
 //
 // Generated from index 'task_assignees_pkey'.
-func TaskAssigneeByID(ctx context.Context, db DB, id uuid.UUID) (*TaskAssignee, error) {
+func TaskAssigneeByID(ctx context.Context, db DB, id string) (*TaskAssignee, error) {
 	// query
 	const sqlstr = `SELECT ` +
 		`id, task_id, user_id, assigned_at, created_at, updated_at ` +
