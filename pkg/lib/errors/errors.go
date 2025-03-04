@@ -1,10 +1,12 @@
 package errors
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 	"runtime/debug"
 
+	"github.com/yudai2929/task-app/database/gen"
 	"github.com/yudai2929/task-app/pkg/lib/errors/codes"
 )
 
@@ -60,8 +62,17 @@ func Is(err, target error) bool {
 
 func Convert(err error) error {
 	converted := &customError{} //nolint:exhaustruct
-	if !errors.As(err, &converted) {
-		return New(codes.CodeUnknown)
+	if errors.As(err, &converted) {
+		return Newf(converted.code, "%s", converted.origin.Error())
 	}
-	return Newf(converted.code, "%s", converted.origin.Error())
+
+	fmt.Printf("%+v\n", err)
+	if errors.Is(err, gen.ErrAlreadyExists) {
+		return Newf(codes.CodeAlreadyExists, "%s", err.Error())
+	} else if errors.Is(err, gen.ErrDoesNotExist) {
+		return Newf(codes.CodeNotFound, "%s", err.Error())
+	} else if errors.Is(err, sql.ErrNoRows) {
+		return Newf(codes.CodeNotFound, "%s", err.Error())
+	}
+	return Newf(codes.CodeUnknown, "%s", err.Error())
 }
