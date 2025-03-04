@@ -8,11 +8,11 @@ import (
 // Config is the configuration for the server
 type Config struct {
 	Port       int    `env:"PORT" envDefault:"8080"`
-	DBUser     string `env:"DB_USER" envDefault:"user"`
+	DBUser     string `env:"DB_USER" envDefault:"postgres"`
 	DBPassword string `env:"DB_PASSWORD" envDefault:"password"`
 	DBHost     string `env:"DB_HOST" envDefault:"localhost"`
 	DBPort     int    `env:"DB_PORT" envDefault:"5432"`
-	DBName     string `env:"DB_NAME" envDefault:"task_db"`
+	DBName     string `env:"DB_NAME" envDefault:"postgres"`
 }
 
 func newConfig() (*Config, error) {
