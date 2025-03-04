@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"time"
 
 	xo "github.com/yudai2929/task-app/database/gen"
 	"github.com/yudai2929/task-app/pkg/entity"
@@ -20,11 +21,21 @@ func NewUserRepository(db *sql.DB) *userRepository {
 }
 
 func (r *userRepository) CreateUser(ctx context.Context, user *entity.User) error {
+	now := time.Now()
+
 	u := &xo.User{
 		ID:           user.ID,
 		Email:        user.Email,
 		PasswordHash: user.PasswordHash,
 		Name:         user.Name,
+		CreatedAt: sql.NullTime{
+			Time:  now,
+			Valid: true,
+		},
+		UpdatedAt: sql.NullTime{
+			Time:  now,
+			Valid: true,
+		},
 	}
 	if err := u.Insert(ctx, r.db); err != nil {
 		return errors.Convert(err)
