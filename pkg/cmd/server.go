@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"log/slog"
 	"net/http"
@@ -9,9 +10,15 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/rs/cors"
 	"github.com/spf13/cobra"
 	api "github.com/yudai2929/task-app/doc/gen"
 	"github.com/yudai2929/task-app/pkg/adapter/handler"
+	"github.com/yudai2929/task-app/pkg/adapter/middleware"
+	"github.com/yudai2929/task-app/pkg/repository"
+	"github.com/yudai2929/task-app/pkg/usecase"
+
+	_ "github.com/lib/pq"
 )
 
 type App struct {
@@ -40,10 +47,12 @@ func (s *App) run() error {
 	}
 
 	// di
-	server, err := initServer(config)
+	server, cleanup, err := initServer(config)
 	if err != nil {
 		return err
 	}
+	defer cleanup()
+
 	// チャネルを作成して OS シグナルを受け取る
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, os.Interrupt, syscall.SIGTERM)
@@ -74,17 +83,36 @@ type server struct {
 	*http.Server
 }
 
-func initServer(cfg *Config) (*server, error) {
-	s, err := api.NewServer(handler.NewHandler())
+func initServer(cfg *Config) (*server, func(), error) {
+	dsn := fmt.Sprintf(
+		"postgres://%s:%s@%s:%d/%s?sslmode=disable",
+		cfg.DBUser, cfg.DBPassword, cfg.DBHost, cfg.DBPort, cfg.DBName,
+	)
+	db, err := sql.Open("postgres", dsn)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
+
+	ur := repository.NewUserRepository(db)
+	au := usecase.NewAuthUsecase(ur, cfg.JWTSecret, cfg.TokenExpiry)
+	s, err := api.NewServer(handler.NewHandler(au), api.WithMiddleware(middleware.AccessLog()))
+	if err != nil {
+		return nil, nil, err
+	}
+
+	corsHandler := cors.New(cors.Options{
+		AllowedOrigins: []string{"*"}, // TODO: 許可するドメインを指定
+		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"},
+		AllowedHeaders: []string{"Content-Type", "Authorization"},
+	}).Handler(s)
 
 	httpServer := &http.Server{
 		Addr:    fmt.Sprintf(":%d", cfg.Port),
-		Handler: s,
+		Handler: corsHandler,
 	}
 
-	return &server{httpServer}, nil
+	return &server{httpServer}, func() {
+		db.Close()
+	}, nil
 
 }

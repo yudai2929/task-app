@@ -73,16 +73,16 @@ func (s *ErrorStatusCode) SetResponse(val Error) {
 }
 
 type LoginOK struct {
-	Jwt OptString `json:"jwt"`
+	Jwt string `json:"jwt"`
 }
 
 // GetJwt returns the value of Jwt.
-func (s *LoginOK) GetJwt() OptString {
+func (s *LoginOK) GetJwt() string {
 	return s.Jwt
 }
 
 // SetJwt sets the value of Jwt.
-func (s *LoginOK) SetJwt(val OptString) {
+func (s *LoginOK) SetJwt(val string) {
 	s.Jwt = val
 }
 
@@ -157,120 +157,28 @@ func (o OptDateTime) Or(d time.Time) time.Time {
 	return d
 }
 
-// NewOptString returns new OptString with value set to v.
-func NewOptString(v string) OptString {
-	return OptString{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptString is optional string.
-type OptString struct {
-	Value string
-	Set   bool
-}
-
-// IsSet returns true if OptString was set.
-func (o OptString) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptString) Reset() {
-	var v string
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptString) SetTo(v string) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptString) Get() (v string, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptString) Or(d string) string {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptUser returns new OptUser with value set to v.
-func NewOptUser(v User) OptUser {
-	return OptUser{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptUser is optional User.
-type OptUser struct {
-	Value User
-	Set   bool
-}
-
-// IsSet returns true if OptUser was set.
-func (o OptUser) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptUser) Reset() {
-	var v User
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptUser) SetTo(v User) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptUser) Get() (v User, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptUser) Or(d User) User {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
 type SignUpCreated struct {
-	User OptUser   `json:"user"`
-	Jwt  OptString `json:"jwt"`
+	User User   `json:"user"`
+	Jwt  string `json:"jwt"`
 }
 
 // GetUser returns the value of User.
-func (s *SignUpCreated) GetUser() OptUser {
+func (s *SignUpCreated) GetUser() User {
 	return s.User
 }
 
 // GetJwt returns the value of Jwt.
-func (s *SignUpCreated) GetJwt() OptString {
+func (s *SignUpCreated) GetJwt() string {
 	return s.Jwt
 }
 
 // SetUser sets the value of User.
-func (s *SignUpCreated) SetUser(val OptUser) {
+func (s *SignUpCreated) SetUser(val User) {
 	s.User = val
 }
 
 // SetJwt sets the value of Jwt.
-func (s *SignUpCreated) SetJwt(val OptString) {
+func (s *SignUpCreated) SetJwt(val string) {
 	s.Jwt = val
 }
 

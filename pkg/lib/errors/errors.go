@@ -1,10 +1,13 @@
 package errors
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 	"runtime/debug"
 
+	"github.com/go-playground/validator/v10"
+	"github.com/yudai2929/task-app/database/gen"
 	"github.com/yudai2929/task-app/pkg/lib/errors/codes"
 )
 
@@ -59,9 +62,32 @@ func Is(err, target error) bool {
 }
 
 func Convert(err error) error {
+
 	converted := &customError{} //nolint:exhaustruct
-	if !errors.As(err, &converted) {
-		return New(codes.CodeUnknown)
+	if errors.As(err, &converted) {
+		return converted
 	}
-	return Newf(converted.code, "%s", converted.origin.Error())
+
+	converted.origin = err
+	converted.stack = string(debug.Stack())
+
+	var v10Err validator.ValidationErrors
+	if errors.As(err, &v10Err) {
+		converted.code = codes.CodeInvalidArgument
+		return converted
+	}
+
+	if errors.Is(err, gen.ErrAlreadyExists) {
+		converted.code = codes.CodeAlreadyExists
+	} else if errors.Is(err, gen.ErrDoesNotExist) {
+		converted.code = codes.CodeNotFound
+	} else if errors.Is(err, sql.ErrNoRows) {
+		converted.code = codes.CodeNotFound
+	} else if errors.Is(err, sql.ErrTxDone) {
+		converted.code = codes.CodeAborted
+	} else {
+		converted.code = codes.CodeUnknown
+	}
+
+	return converted
 }

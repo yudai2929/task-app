@@ -1,7 +1,13 @@
 package handler
 
-type Handler struct{}
+import "github.com/yudai2929/task-app/pkg/usecase"
 
-func NewHandler() *Handler {
-	return &Handler{}
+type Handler struct {
+	au usecase.AuthUsecase
+}
+
+func NewHandler(au usecase.AuthUsecase) *Handler {
+	return &Handler{
+		au: au,
+	}
 }

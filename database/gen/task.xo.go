@@ -5,14 +5,12 @@ package gen
 import (
 	"context"
 	"database/sql"
-
-	"github.com/google/uuid"
 )
 
 // Task represents a row from 'public.tasks'.
 type Task struct {
-	ID          uuid.UUID    `json:"id"`          // id
-	UserID      uuid.UUID    `json:"user_id"`     // user_id
+	ID          string       `json:"id"`          // id
+	UserID      string       `json:"user_id"`     // user_id
 	Title       string       `json:"title"`       // title
 	Description string       `json:"description"` // description
 	Status      int          `json:"status"`      // status
@@ -135,7 +133,7 @@ func (t *Task) Delete(ctx context.Context, db DB) error {
 // TasksByUserID retrieves a row from 'public.tasks' as a [Task].
 //
 // Generated from index 'idx_tasks_user_id'.
-func TasksByUserID(ctx context.Context, db DB, userID uuid.UUID) ([]*Task, error) {
+func TasksByUserID(ctx context.Context, db DB, userID string) ([]*Task, error) {
 	// query
 	const sqlstr = `SELECT ` +
 		`id, user_id, title, description, status, due_date, created_at, updated_at ` +
@@ -169,7 +167,7 @@ func TasksByUserID(ctx context.Context, db DB, userID uuid.UUID) ([]*Task, error
 // TaskByID retrieves a row from 'public.tasks' as a [Task].
 //
 // Generated from index 'tasks_pkey'.
-func TaskByID(ctx context.Context, db DB, id uuid.UUID) (*Task, error) {
+func TaskByID(ctx context.Context, db DB, id string) (*Task, error) {
 	// query
 	const sqlstr = `SELECT ` +
 		`id, user_id, title, description, status, due_date, created_at, updated_at ` +

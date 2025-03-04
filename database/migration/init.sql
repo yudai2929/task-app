@@ -1,5 +1,5 @@
 CREATE TABLE users (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id VARCHAR PRIMARY KEY,
     name VARCHAR NOT NULL,
     email VARCHAR UNIQUE NOT NULL,
     password_hash VARCHAR NOT NULL,
@@ -10,8 +10,8 @@ CREATE TABLE users (
 CREATE INDEX idx_users_email ON users(email);
 
 CREATE TABLE tasks (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID NOT NULL,
+    id VARCHAR PRIMARY KEY,
+    user_id VARCHAR NOT NULL,
     title VARCHAR NOT NULL,
     description TEXT NOT NULL,
     status INT NOT NULL CHECK (status IN (1, 2, 3)), -- 1: TODO, 2: IN_PROGRESS, 3: DONE
@@ -24,9 +24,9 @@ CREATE TABLE tasks (
 CREATE INDEX idx_tasks_user_id ON tasks(user_id);
 
 CREATE TABLE task_assignees (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    task_id UUID NOT NULL,
-    user_id UUID NOT NULL,
+    id VARCHAR PRIMARY KEY,
+    task_id VARCHAR NOT NULL,
+    user_id VARCHAR NOT NULL,
     assigned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
