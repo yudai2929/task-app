@@ -62,10 +62,14 @@ func Is(err, target error) bool {
 }
 
 func Convert(err error) error {
+
 	converted := &customError{} //nolint:exhaustruct
 	if errors.As(err, &converted) {
-		return Newf(converted.code, "%s", converted.origin.Error())
+		return converted
 	}
+
+	converted.origin = err
+	converted.stack = string(debug.Stack())
 
 	var v10Err validator.ValidationErrors
 	if errors.As(err, &v10Err) {
@@ -79,6 +83,11 @@ func Convert(err error) error {
 		converted.code = codes.CodeNotFound
 	} else if errors.Is(err, sql.ErrNoRows) {
 		converted.code = codes.CodeNotFound
+	} else if errors.Is(err, sql.ErrTxDone) {
+		converted.code = codes.CodeAborted
+	} else {
+		converted.code = codes.CodeUnknown
 	}
+
 	return converted
 }

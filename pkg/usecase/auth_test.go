@@ -48,7 +48,7 @@ func TestAuthUsecase_SignUp(t *testing.T) {
 			ctx:     ctx,
 			wantErr: true,
 			setup: func(mockUserRepo *mock.MockUserRepository) {
-				mockUserRepo.EXPECT().GetUserByEmail(ctx, "hoge@hoge.com").Return(nil, errors.New(codes.CodeAlreadyExists))
+				mockUserRepo.EXPECT().GetUserByEmail(ctx, "hoge@hoge.com").Return(user, nil)
 			},
 		},
 		{
@@ -84,7 +84,7 @@ func TestAuthUsecase_SignUp(t *testing.T) {
 			if tt.setup != nil {
 				tt.setup(mocks.ur)
 			}
-			out, err := u.SingUp(tt.ctx, tt.in)
+			out, err := u.SignUp(tt.ctx, tt.in)
 			if tt.wantErr {
 				assert.Equal(t, tt.errcode, errors.Code(err))
 				return

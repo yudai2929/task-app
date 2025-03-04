@@ -50,16 +50,19 @@ type SingUpOutput struct {
 	JWT  string
 }
 
-func (u *authUsecase) SingUp(ctx context.Context, in *SingUpInput) (*SingUpOutput, error) {
+func (u *authUsecase) SignUp(ctx context.Context, in *SingUpInput) (*SingUpOutput, error) {
 	if err := u.validate.Struct(in); err != nil {
 		return nil, errors.Convert(err)
 	}
 
-	_, err := u.ur.GetUserByEmail(ctx, in.Email)
+	user, err := u.ur.GetUserByEmail(ctx, in.Email)
 	if err != nil {
 		if !errors.EqualCode(err, codes.CodeNotFound) {
 			return nil, errors.Convert(err)
 		}
+	}
+	if user != nil {
+		return nil, errors.Newf(codes.CodeAlreadyExists, "user already exists")
 	}
 
 	hashPassword, err := u.hashPassword(in.Password)
@@ -67,7 +70,7 @@ func (u *authUsecase) SingUp(ctx context.Context, in *SingUpInput) (*SingUpOutpu
 		return nil, errors.Newf(codes.CodeInternal, "failed to hash password: %w", err)
 	}
 
-	user := &entity.User{
+	user = &entity.User{
 		ID:           u.uuid(),
 		Email:        in.Email,
 		PasswordHash: hashPassword,

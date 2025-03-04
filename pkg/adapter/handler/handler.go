@@ -6,6 +6,8 @@ type Handler struct {
 	au usecase.AuthUsecase
 }
 
-func NewHandler() *Handler {
-	return &Handler{}
+func NewHandler(au usecase.AuthUsecase) *Handler {
+	return &Handler{
+		au: au,
+	}
 }

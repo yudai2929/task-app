@@ -9,11 +9,11 @@ import (
 )
 
 func (h *Handler) Login(ctx context.Context, req *api.LoginReq) (*api.LoginOK, error) {
-	in := usecase.LoginInput{
+	in := &usecase.LoginInput{
 		Email:    req.GetEmail(),
 		Password: req.GetPassword(),
 	}
-	out, err := h.au.Login(ctx, &in)
+	out, err := h.au.Login(ctx, in)
 	if err != nil {
 		return nil, errors.Convert(err)
 	}
@@ -24,12 +24,12 @@ func (h *Handler) Login(ctx context.Context, req *api.LoginReq) (*api.LoginOK, e
 }
 
 func (h *Handler) SignUp(ctx context.Context, req *api.SignUpReq) (*api.SignUpCreated, error) {
-	in := usecase.SingUpInput{
+	in := &usecase.SingUpInput{
 		Email:    req.GetEmail(),
 		Password: req.GetPassword(),
 		Name:     req.GetName(),
 	}
-	out, err := h.au.SignUp(ctx, &in)
+	out, err := h.au.SignUp(ctx, in)
 	if err != nil {
 		return nil, errors.Convert(err)
 	}
