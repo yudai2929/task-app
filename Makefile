@@ -1,5 +1,5 @@
 run_server:
-	go run cmd/server/main.go
+	go run cmd/server/main.go server
 
 set_up:
 	go mod tidy
