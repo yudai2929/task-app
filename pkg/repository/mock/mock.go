@@ -219,34 +219,6 @@ func (m *MockTaskAssigneeRepository) EXPECT() *MockTaskAssigneeRepositoryMockRec
 	return m.recorder
 }
 
-// BatchCreate mocks base method.
-func (m *MockTaskAssigneeRepository) BatchCreate(ctx context.Context, assignees entity.TaskAssignees) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "BatchCreate", ctx, assignees)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// BatchCreate indicates an expected call of BatchCreate.
-func (mr *MockTaskAssigneeRepositoryMockRecorder) BatchCreate(ctx, assignees any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BatchCreate", reflect.TypeOf((*MockTaskAssigneeRepository)(nil).BatchCreate), ctx, assignees)
-}
-
-// BatchDeleteByTaskID mocks base method.
-func (m *MockTaskAssigneeRepository) BatchDeleteByTaskID(ctx context.Context, taskID string) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "BatchDeleteByTaskID", ctx, taskID)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// BatchDeleteByTaskID indicates an expected call of BatchDeleteByTaskID.
-func (mr *MockTaskAssigneeRepositoryMockRecorder) BatchDeleteByTaskID(ctx, taskID any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BatchDeleteByTaskID", reflect.TypeOf((*MockTaskAssigneeRepository)(nil).BatchDeleteByTaskID), ctx, taskID)
-}
-
 // GetTaskAssignee mocks base method.
 func (m *MockTaskAssigneeRepository) GetTaskAssignee(ctx context.Context, taskID, userID string) (*entity.TaskAssignee, error) {
 	m.ctrl.T.Helper()
@@ -260,6 +232,20 @@ func (m *MockTaskAssigneeRepository) GetTaskAssignee(ctx context.Context, taskID
 func (mr *MockTaskAssigneeRepositoryMockRecorder) GetTaskAssignee(ctx, taskID, userID any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTaskAssignee", reflect.TypeOf((*MockTaskAssigneeRepository)(nil).GetTaskAssignee), ctx, taskID, userID)
+}
+
+// UpdateTaskAssignees mocks base method.
+func (m *MockTaskAssigneeRepository) UpdateTaskAssignees(ctx context.Context, taskID string, userIDs []string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateTaskAssignees", ctx, taskID, userIDs)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateTaskAssignees indicates an expected call of UpdateTaskAssignees.
+func (mr *MockTaskAssigneeRepositoryMockRecorder) UpdateTaskAssignees(ctx, taskID, userIDs any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateTaskAssignees", reflect.TypeOf((*MockTaskAssigneeRepository)(nil).UpdateTaskAssignees), ctx, taskID, userIDs)
 }
 
 // MockTransactionRepository is a mock of TransactionRepository interface.

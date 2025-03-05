@@ -47,20 +47,9 @@ func TestTaskAssigneeRepository_CRUD(t *testing.T) {
 	require.NoError(t, err)
 
 	// Create task assignees
-	assignees := entity.TaskAssignees{
-		&entity.TaskAssignee{
-			ID:     "assignee1",
-			TaskID: "task1",
-			UserID: "user1",
-		},
-		&entity.TaskAssignee{
-			ID:     "assignee2",
-			TaskID: "task1",
-			UserID: "user2",
-		},
-	}
+	userIDs := []string{"user1", "user2"}
 
-	err = taskAssigneeRepo.BatchCreate(ctx, assignees)
+	err = taskAssigneeRepo.UpdateTaskAssignees(ctx, "task1", userIDs)
 	require.NoError(t, err)
 
 	// Get task assignee by task ID and user ID
@@ -68,8 +57,19 @@ func TestTaskAssigneeRepository_CRUD(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, assignee)
 
+	// Update task assignees
+	newUserIDs := []string{"user1"}
+
+	err = taskAssigneeRepo.UpdateTaskAssignees(ctx, "task1", newUserIDs)
+	require.NoError(t, err)
+
+	// Get task assignee by task ID and user ID after update
+	assignee, err = taskAssigneeRepo.GetTaskAssignee(ctx, "task1", "user1")
+	require.NoError(t, err)
+	require.NotNil(t, assignee)
+
 	// Delete task assignees by task ID
-	err = taskAssigneeRepo.BatchDeleteByTaskID(ctx, "task1")
+	err = taskAssigneeRepo.UpdateTaskAssignees(ctx, "task1", []string{})
 	require.NoError(t, err)
 
 	// Get task assignee by task ID and user ID after delete

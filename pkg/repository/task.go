@@ -106,8 +106,8 @@ func (r *taskRepository) ListMyTasks(ctx context.Context, userID string) (entity
 
 func (r *taskRepository) UpdateTask(ctx context.Context, task *entity.Task) (*entity.Task, error) {
 	var updatedTask *entity.Task
-	err := runInTransaction(ctx, r.db, func(ctx context.Context) error {
-		t, err := xo.TaskByID(ctx, r.db, task.ID)
+	err := runInTransaction(ctx, r.db, func(ctx context.Context, tx *sql.Tx) error {
+		t, err := xo.TaskByID(ctx, tx, task.ID)
 		if err != nil {
 			return errors.Convert(err)
 		}
@@ -122,7 +122,7 @@ func (r *taskRepository) UpdateTask(ctx context.Context, task *entity.Task) (*en
 			Valid: true,
 		}
 
-		if err := t.Update(ctx, r.db); err != nil {
+		if err := t.Update(ctx, tx); err != nil {
 			return errors.Convert(err)
 		}
 		updatedTask = r.convertTask(t)
@@ -135,13 +135,13 @@ func (r *taskRepository) UpdateTask(ctx context.Context, task *entity.Task) (*en
 }
 
 func (r *taskRepository) DeleteTask(ctx context.Context, id string) error {
-	return runInTransaction(ctx, r.db, func(ctx context.Context) error {
-		t, err := xo.TaskByID(ctx, r.db, id)
+	return runInTransaction(ctx, r.db, func(ctx context.Context, tx *sql.Tx) error {
+		t, err := xo.TaskByID(ctx, tx, id)
 		if err != nil {
 			return errors.Convert(err)
 		}
 
-		if err := t.Delete(ctx, r.db); err != nil {
+		if err := t.Delete(ctx, tx); err != nil {
 			return errors.Convert(err)
 		}
 		return nil

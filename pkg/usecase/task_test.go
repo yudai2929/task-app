@@ -461,3 +461,85 @@ func TestTaskUsecase_DeleteTask(t *testing.T) {
 		})
 	}
 }
+
+func TestTaskUsecase_AssignTask(t *testing.T) {
+	t.Parallel()
+	ctx := context.Background()
+	in := &AssignTaskInput{
+		UserID:      "user1",
+		TaskID:      "task1",
+		AssigneeIDs: []string{"user2", "user3"},
+	}
+	task := &entity.Task{
+		ID:          "task1",
+		UserID:      "user1",
+		Title:       "Test Task",
+		Description: "This is a test task",
+		Status:      entity.TaskStatusTodo,
+		DueDate:     nil,
+	}
+	tests := []struct {
+		name    string
+		in      *AssignTaskInput
+		errcode codes.Code
+		ctx     context.Context
+		wantErr bool
+		setup   func(mockTaskRepo *mock.MockTaskRepository, mockAssigneeRepo *mock.MockTaskAssigneeRepository)
+	}{
+		{
+			name:    "success",
+			in:      in,
+			ctx:     ctx,
+			wantErr: false,
+			setup: func(mockTaskRepo *mock.MockTaskRepository, mockAssigneeRepo *mock.MockTaskAssigneeRepository) {
+				mockTaskRepo.EXPECT().GetTask(ctx, "task1").Return(task, nil)
+				mockAssigneeRepo.EXPECT().UpdateTaskAssignees(ctx, "task1", []string{"user2", "user3"}).Return(nil)
+			},
+		},
+		{
+			name:    "err: invalid",
+			in:      &AssignTaskInput{},
+			errcode: codes.CodeInvalidArgument,
+			ctx:     ctx,
+			wantErr: true,
+		},
+		{
+			name:    "err: task not found",
+			in:      in,
+			errcode: codes.CodeNotFound,
+			ctx:     context.Background(),
+			wantErr: true,
+			setup: func(mockTaskRepo *mock.MockTaskRepository, mockAssigneeRepo *mock.MockTaskAssigneeRepository) {
+				mockTaskRepo.EXPECT().GetTask(ctx, "task1").Return(nil, errors.New(codes.CodeNotFound))
+			},
+		},
+		{
+			name:    "err: permission denied",
+			in:      &AssignTaskInput{UserID: "user2", TaskID: "task1", AssigneeIDs: []string{"user3"}},
+			errcode: codes.CodePermissionDenied,
+			ctx:     ctx,
+			wantErr: true,
+			setup: func(mockTaskRepo *mock.MockTaskRepository, mockAssigneeRepo *mock.MockTaskAssigneeRepository) {
+				mockTaskRepo.EXPECT().GetTask(ctx, "task1").Return(task, nil)
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			mocks := newMocks(t)
+			u := newTaskUsecaseMock(mocks)
+			if tt.setup != nil {
+				tt.setup(mocks.tr, mocks.ar)
+			}
+
+			err := u.AssignTask(tt.ctx, tt.in)
+			if tt.wantErr {
+				assert.Equal(t, tt.errcode, errors.Code(err))
+				return
+			}
+			assert.NoError(t, err)
+		})
+	}
+}
