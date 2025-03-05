@@ -40,17 +40,17 @@ func NewAuthUsecase(
 	}
 }
 
-type SingUpInput struct {
+type SignUpInput struct {
 	Email    string `validate:"required,email"`
 	Password string `validate:"required,min=8"`
 	Name     string `validate:"required"`
 }
-type SingUpOutput struct {
+type SignUpOutput struct {
 	User *entity.User
 	JWT  string
 }
 
-func (u *authUsecase) SignUp(ctx context.Context, in *SingUpInput) (*SingUpOutput, error) {
+func (u *authUsecase) SignUp(ctx context.Context, in *SignUpInput) (*SignUpOutput, error) {
 	if err := u.validate.Struct(in); err != nil {
 		return nil, errors.Convert(err)
 	}
@@ -86,7 +86,7 @@ func (u *authUsecase) SignUp(ctx context.Context, in *SingUpInput) (*SingUpOutpu
 		return nil, errors.Newf(codes.CodeInternal, "failed to generate jwt: %w", err)
 	}
 
-	return &SingUpOutput{User: user, JWT: token}, nil
+	return &SignUpOutput{User: user, JWT: token}, nil
 }
 
 type LoginInput struct {

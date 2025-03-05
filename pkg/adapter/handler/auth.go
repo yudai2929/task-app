@@ -24,7 +24,7 @@ func (h *Handler) Login(ctx context.Context, req *api.LoginReq) (*api.LoginOK, e
 }
 
 func (h *Handler) SignUp(ctx context.Context, req *api.SignUpReq) (*api.SignUpCreated, error) {
-	in := &usecase.SingUpInput{
+	in := &usecase.SignUpInput{
 		Email:    req.GetEmail(),
 		Password: req.GetPassword(),
 		Name:     req.GetName(),
