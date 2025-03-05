@@ -6,12 +6,13 @@ package api
 type OperationName = string
 
 const (
-	AssignTaskOperation OperationName = "AssignTask"
-	CreateTaskOperation OperationName = "CreateTask"
-	DeleteTaskOperation OperationName = "DeleteTask"
-	GetTaskOperation    OperationName = "GetTask"
-	ListTasksOperation  OperationName = "ListTasks"
-	LoginOperation      OperationName = "Login"
-	SignUpOperation     OperationName = "SignUp"
-	UpdateTaskOperation OperationName = "UpdateTask"
+	AssignTaskOperation  OperationName = "AssignTask"
+	CreateTaskOperation  OperationName = "CreateTask"
+	DeleteTaskOperation  OperationName = "DeleteTask"
+	GetTaskOperation     OperationName = "GetTask"
+	HealthCheckOperation OperationName = "HealthCheck"
+	ListTasksOperation   OperationName = "ListTasks"
+	LoginOperation       OperationName = "Login"
+	SignUpOperation      OperationName = "SignUp"
+	UpdateTaskOperation  OperationName = "UpdateTask"
 )

@@ -61,6 +61,27 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				break
 			}
 			switch elem[0] {
+			case 'h': // Prefix: "health"
+				origElem := elem
+				if l := len("health"); len(elem) >= l && elem[0:l] == "health" {
+					elem = elem[l:]
+				} else {
+					break
+				}
+
+				if len(elem) == 0 {
+					// Leaf node.
+					switch r.Method {
+					case "GET":
+						s.handleHealthCheckRequest([0]string{}, elemIsEscaped, w, r)
+					default:
+						s.notAllowed(w, r, "GET")
+					}
+
+					return
+				}
+
+				elem = origElem
 			case 'l': // Prefix: "login"
 				origElem := elem
 				if l := len("login"); len(elem) >= l && elem[0:l] == "login" {
@@ -286,6 +307,31 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 				break
 			}
 			switch elem[0] {
+			case 'h': // Prefix: "health"
+				origElem := elem
+				if l := len("health"); len(elem) >= l && elem[0:l] == "health" {
+					elem = elem[l:]
+				} else {
+					break
+				}
+
+				if len(elem) == 0 {
+					// Leaf node.
+					switch method {
+					case "GET":
+						r.name = HealthCheckOperation
+						r.summary = "Health check"
+						r.operationID = "healthCheck"
+						r.pathPattern = "/v1/health"
+						r.args = args
+						r.count = 0
+						return r, true
+					default:
+						return
+					}
+				}
+
+				elem = origElem
 			case 'l': // Prefix: "login"
 				origElem := elem
 				if l := len("login"); len(elem) >= l && elem[0:l] == "login" {

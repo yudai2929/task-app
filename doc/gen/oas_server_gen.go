@@ -32,6 +32,12 @@ type Handler interface {
 	//
 	// GET /v1/tasks/{id}
 	GetTask(ctx context.Context, params GetTaskParams) (*Task, error)
+	// HealthCheck implements healthCheck operation.
+	//
+	// Health check.
+	//
+	// GET /v1/health
+	HealthCheck(ctx context.Context) (*HealthCheckOK, error)
 	// ListTasks implements listTasks operation.
 	//
 	// Get task list.

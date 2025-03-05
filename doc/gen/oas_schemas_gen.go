@@ -122,6 +122,20 @@ func (s *ErrorStatusCode) SetResponse(val Error) {
 	s.Response = val
 }
 
+type HealthCheckOK struct {
+	Status string `json:"status"`
+}
+
+// GetStatus returns the value of Status.
+func (s *HealthCheckOK) GetStatus() string {
+	return s.Status
+}
+
+// SetStatus sets the value of Status.
+func (s *HealthCheckOK) SetStatus(val string) {
+	s.Status = val
+}
+
 type LoginOK struct {
 	Jwt string `json:"jwt"`
 }

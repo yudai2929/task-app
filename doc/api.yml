@@ -289,6 +289,30 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /v1/health:
+    get:
+      tags:
+        - Health
+      summary: Health check
+      operationId: healthCheck
+      responses:
+        "200":
+          description: Health check successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                required:
+                  - status
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
 components:
   securitySchemes:
     BearerAuth:

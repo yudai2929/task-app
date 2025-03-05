@@ -49,6 +49,15 @@ func (UnimplementedHandler) GetTask(ctx context.Context, params GetTaskParams) (
 	return r, ht.ErrNotImplemented
 }
 
+// HealthCheck implements healthCheck operation.
+//
+// Health check.
+//
+// GET /v1/health
+func (UnimplementedHandler) HealthCheck(ctx context.Context) (r *HealthCheckOK, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // ListTasks implements listTasks operation.
 //
 // Get task list.
