@@ -31,7 +31,7 @@ func RequireAuth(secretKey string, excludePaths ...string) middleware.Middleware
 		}
 
 		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
-		claims, err := jwt.ValidateToken(tokenString, secretKey)
+		claims, err := jwt.Validate(tokenString, secretKey)
 		if err != nil {
 			return middleware.Response{}, errors.Newf(codes.CodeUnauthenticated, err.Error())
 		}

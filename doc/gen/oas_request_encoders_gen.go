@@ -26,7 +26,7 @@ func encodeAssignTaskRequest(
 }
 
 func encodeCreateTaskRequest(
-	req *Task,
+	req *CreateTaskReq,
 	r *http.Request,
 ) error {
 	const contentType = "application/json"
@@ -68,7 +68,7 @@ func encodeSignUpRequest(
 }
 
 func encodeUpdateTaskRequest(
-	req *Task,
+	req *UpdateTaskReq,
 	r *http.Request,
 ) error {
 	const contentType = "application/json"

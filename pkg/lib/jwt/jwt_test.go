@@ -91,7 +91,7 @@ func TestValidateToken(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			claims, err := ValidateToken(tt.token, tt.secret)
+			claims, err := Validate(tt.token, tt.secret)
 			if tt.wantErr {
 				assert.Error(t, err)
 				assert.Equal(t, tt.errCode, errors.Code(err))

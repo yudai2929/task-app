@@ -17,7 +17,7 @@ func Generate(userID string, secret string, expiry time.Duration) (string, error
 	return token.SignedString([]byte(secret))
 }
 
-func ValidateToken(tokenString string, secret string) (jwt.MapClaims, error) {
+func Validate(tokenString string, secret string) (jwt.MapClaims, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, errors.Newf(codes.CodeUnauthenticated, "unexpected signing method")
