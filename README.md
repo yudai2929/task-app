@@ -1,6 +1,11 @@
 # タスク管理アプリ
 
+LayerX 様 インターンの課題です
+
 ## 設計
+こちらを参照ください
+
+https://github.com/yudai2929/task-app/blob/main/DESIGN.md
 
 ## 環境
 
@@ -71,3 +76,10 @@ Swagger UI は以下の URL からアクセス可能：
 ```
 http://localhost:8081
 ```
+
+## 所要時間
+計12時間程度
+- 設計 1.5 時間
+- ドキュメント 1 時間
+- 環境整備 1.5 時間
+- 実装 8 時間
