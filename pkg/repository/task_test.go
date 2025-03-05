@@ -61,6 +61,11 @@ func TestTaskRepository_CRUD(t *testing.T) {
 	require.NoError(t, err)
 	require.NotEmpty(t, tasks)
 
+	// List my tasks
+	myTasks, err := taskRepo.ListMyTasks(ctx, "user1")
+	require.NoError(t, err)
+	require.NotEmpty(t, myTasks)
+
 	// Delete task
 	err = taskRepo.DeleteTask(ctx, "task1")
 	require.NoError(t, err)

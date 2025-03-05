@@ -80,6 +80,34 @@ func (r *taskRepository) ListTasks(ctx context.Context) (entity.Tasks, error) {
 	return tasks, nil
 }
 
+func (r *taskRepository) ListMyTasks(ctx context.Context, userID string) (entity.Tasks, error) {
+	db := getDB(ctx, r.db)
+	const sqlstr = `
+		SELECT DISTINCT t.id, t.user_id, t.title, t.description, t.status, t.due_date, t.created_at, t.updated_at
+		FROM tasks t
+		LEFT JOIN task_assignees ta ON t.id = ta.task_id
+		WHERE t.user_id = $1 OR ta.user_id = $1
+		ORDER BY t.created_at DESC`
+	rows, err := db.QueryContext(ctx, sqlstr, userID)
+	if err != nil {
+		return nil, errors.Convert(err)
+	}
+	defer rows.Close()
+
+	var tasks entity.Tasks
+	for rows.Next() {
+		t := xo.Task{}
+		if err := rows.Scan(&t.ID, &t.UserID, &t.Title, &t.Description, &t.Status, &t.DueDate, &t.CreatedAt, &t.UpdatedAt); err != nil {
+			return nil, errors.Convert(err)
+		}
+		tasks = append(tasks, r.convertTask(&t))
+	}
+	if err := rows.Err(); err != nil {
+		return nil, errors.Convert(err)
+	}
+	return tasks, nil
+}
+
 func (r *taskRepository) UpdateTask(ctx context.Context, task *entity.Task) error {
 	db := getDB(ctx, r.db)
 	t, err := xo.TaskByID(ctx, db, task.ID)

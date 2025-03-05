@@ -150,6 +150,21 @@ func (mr *MockTaskRepositoryMockRecorder) GetTask(ctx, id any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTask", reflect.TypeOf((*MockTaskRepository)(nil).GetTask), ctx, id)
 }
 
+// ListMyTasks mocks base method.
+func (m *MockTaskRepository) ListMyTasks(ctx context.Context, userID string) (entity.Tasks, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListMyTasks", ctx, userID)
+	ret0, _ := ret[0].(entity.Tasks)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListMyTasks indicates an expected call of ListMyTasks.
+func (mr *MockTaskRepositoryMockRecorder) ListMyTasks(ctx, userID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListMyTasks", reflect.TypeOf((*MockTaskRepository)(nil).ListMyTasks), ctx, userID)
+}
+
 // ListTasks mocks base method.
 func (m *MockTaskRepository) ListTasks(ctx context.Context) (entity.Tasks, error) {
 	m.ctrl.T.Helper()

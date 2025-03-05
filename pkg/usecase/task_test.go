@@ -190,3 +190,85 @@ func TestTaskUsecase_GetTask(t *testing.T) {
 		})
 	}
 }
+
+func TestTaskUsecase_ListTasks(t *testing.T) {
+	ctx := context.Background()
+	in := &ListTasksInput{
+		UserID: "user1",
+	}
+	task1 := &entity.Task{
+		ID:          "task1",
+		UserID:      "user1",
+		Title:       "Test Task 1",
+		Description: "This is a test task 1",
+		Status:      entity.TaskStatusTodo,
+		DueDate:     nil,
+	}
+	task2 := &entity.Task{
+		ID:          "task2",
+		UserID:      "user2",
+		Title:       "Test Task 2",
+		Description: "This is a test task 2",
+		Status:      entity.TaskStatusTodo,
+		DueDate:     nil,
+	}
+	out := &ListTasksOutput{
+		Tasks: entity.Tasks{task1, task2},
+	}
+	tests := []struct {
+		name    string
+		in      *ListTasksInput
+		out     *ListTasksOutput
+		errcode codes.Code
+		ctx     context.Context
+		wantErr bool
+		setup   func(mockTaskRepo *mock.MockTaskRepository)
+	}{
+		{
+			name:    "success",
+			in:      in,
+			out:     out,
+			ctx:     ctx,
+			wantErr: false,
+			setup: func(mockTaskRepo *mock.MockTaskRepository) {
+				mockTaskRepo.EXPECT().ListMyTasks(ctx, "user1").Return(entity.Tasks{task1, task2}, nil)
+			},
+		},
+		{
+			name:    "err: invalid",
+			in:      &ListTasksInput{},
+			errcode: codes.CodeInvalidArgument,
+			ctx:     ctx,
+			wantErr: true,
+		},
+		{
+			name:    "err: failed to list my tasks",
+			in:      in,
+			out:     nil,
+			errcode: codes.CodeInternal,
+			ctx:     context.Background(),
+			wantErr: true,
+			setup: func(mockTaskRepo *mock.MockTaskRepository) {
+				mockTaskRepo.EXPECT().ListMyTasks(ctx, "user1").Return(nil, errors.New(codes.CodeInternal))
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mocks := newMocks(t)
+			u := newTaskUsecaseMock(mocks)
+			if tt.setup != nil {
+				tt.setup(mocks.tr)
+			}
+
+			out, err := u.ListTasks(tt.ctx, tt.in)
+			if tt.wantErr {
+				assert.Equal(t, tt.errcode, errors.Code(err))
+				return
+			}
+			assert.NoError(t, err)
+			assert.Equal(t, tt.out, out)
+		})
+	}
+}

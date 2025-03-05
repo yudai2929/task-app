@@ -94,3 +94,24 @@ func (u *taskUsecase) GetTask(ctx context.Context, in *GetTaskInput) (*GetTaskOu
 
 	return &GetTaskOutput{Task: task}, nil
 }
+
+type ListTasksInput struct {
+	UserID string `validate:"required"`
+}
+
+type ListTasksOutput struct {
+	Tasks entity.Tasks
+}
+
+func (u *taskUsecase) ListTasks(ctx context.Context, in *ListTasksInput) (*ListTasksOutput, error) {
+	if err := u.validate.Struct(in); err != nil {
+		return nil, errors.Convert(err)
+	}
+
+	tasks, err := u.tr.ListMyTasks(ctx, in.UserID)
+	if err != nil {
+		return nil, errors.Convert(err)
+	}
+
+	return &ListTasksOutput{Tasks: tasks}, nil
+}

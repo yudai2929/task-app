@@ -2,9 +2,15 @@ package usecase
 
 import "context"
 
+//go:generate mkdir -p mock
+//go:generate mockgen -package=mock -source=./repository.go -destination=./mock/mock.go
 type AuthUsecase interface {
 	Login(ctx context.Context, in *LoginInput) (*LoginOutput, error)
-	SignUp(ctx context.Context, in *SingUpInput) (*SingUpOutput, error)
+	SignUp(ctx context.Context, in *SignUpInput) (*SignUpOutput, error)
 }
 
-type TaskUsecase interface{}
+type TaskUsecase interface {
+	CreateTask(ctx context.Context, in *CreateTaskInput) (*CreateTaskOutput, error)
+	GetTask(ctx context.Context, in *GetTaskInput) (*GetTaskOutput, error)
+	ListTasks(ctx context.Context, in *ListTasksInput) (*ListTasksOutput, error)
+}
