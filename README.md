@@ -1,6 +1,8 @@
 # タスク管理アプリ
 
 ## 設計
+こちらの参照
+https://github.com/yudai2929/task-app/blob/main/DESIGN.md
 
 ## 環境
 
