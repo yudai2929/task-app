@@ -15,4 +15,5 @@ type TaskUsecase interface {
 	ListTasks(ctx context.Context, in *ListTasksInput) (*ListTasksOutput, error)
 	UpdateTask(ctx context.Context, in *UpdateTaskInput) (*UpdateTaskOutput, error)
 	DeleteTask(ctx context.Context, in *DeleteTaskInput) error
+	AssignTask(ctx context.Context, in *AssignTaskInput) error
 }
