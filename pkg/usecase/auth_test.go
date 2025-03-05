@@ -13,6 +13,7 @@ import (
 )
 
 func TestAuthUsecase_SignUp(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 	in := &SignUpInput{
 		Email:    "hoge@hoge.com",
@@ -79,6 +80,7 @@ func TestAuthUsecase_SignUp(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			mocks := newMocks(t)
 			u := newAuthUsecaseMock(mocks)
 			if tt.setup != nil {
