@@ -95,7 +95,12 @@ func initServer(cfg *Config) (*server, func(), error) {
 
 	ur := repository.NewUserRepository(db)
 	au := usecase.NewAuthUsecase(ur, cfg.JWTSecret, cfg.TokenExpiry)
-	s, err := api.NewServer(handler.NewHandler(au), api.WithMiddleware(middleware.AccessLog()))
+	h := handler.NewHandler(au)
+
+	s, err := api.NewServer(h, api.WithMiddleware(
+		middleware.AccessLog(),
+		middleware.RequireAuth(cfg.JWTSecret, "/v1/signup", "/v1/login"),
+	))
 	if err != nil {
 		return nil, nil, err
 	}
