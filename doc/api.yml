@@ -130,7 +130,21 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Task"
+              type: object
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                status:
+                  type: integer
+                due_date:
+                  type: string
+                  format: date-time
+              required:
+                - title
+                - description
+                - status
       responses:
         "201":
           description: Task created successfully
@@ -172,7 +186,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-
     put:
       security:
         - BearerAuth: []
@@ -191,7 +204,21 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Task"
+              type: object
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                status:
+                  type: integer
+                due_date:
+                  type: string
+                  format: date-time
+              required:
+                - title
+                - description
+                - status
       responses:
         "200":
           description: Task updated successfully
@@ -228,7 +255,42 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-
+  /v1/tasks/{id}/assign:
+    post:
+      security:
+        - BearerAuth: []
+      tags:
+        - Tasks
+      summary: Assign users to a task
+      operationId: assignTask
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_ids:
+                  type: array
+                  items:
+                    type: string
+              required:
+                - user_ids
+      responses:
+        "200":
+          description: Users assigned successfully
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
 components:
   securitySchemes:
     BearerAuth:
