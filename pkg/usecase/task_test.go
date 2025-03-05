@@ -17,7 +17,6 @@ func TestTaskUsecase_CreateTask(t *testing.T) {
 		UserID:      "user1",
 		Title:       "Test Task",
 		Description: "This is a test task",
-		Status:      entity.TaskStatusTodo,
 		DueDate:     nil,
 	}
 	task := &entity.Task{

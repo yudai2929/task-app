@@ -140,10 +140,6 @@ func (s *CreateTaskReq) encodeFields(e *jx.Encoder) {
 		e.Str(s.Description)
 	}
 	{
-		e.FieldStart("status")
-		e.Int(s.Status)
-	}
-	{
 		if s.DueDate.Set {
 			e.FieldStart("due_date")
 			s.DueDate.Encode(e, json.EncodeDateTime)
@@ -151,11 +147,10 @@ func (s *CreateTaskReq) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfCreateTaskReq = [4]string{
+var jsonFieldsNameOfCreateTaskReq = [3]string{
 	0: "title",
 	1: "description",
-	2: "status",
-	3: "due_date",
+	2: "due_date",
 }
 
 // Decode decodes CreateTaskReq from json.
@@ -191,18 +186,6 @@ func (s *CreateTaskReq) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"description\"")
 			}
-		case "status":
-			requiredBitSet[0] |= 1 << 2
-			if err := func() error {
-				v, err := d.Int()
-				s.Status = int(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"status\"")
-			}
 		case "due_date":
 			if err := func() error {
 				s.DueDate.Reset()
@@ -223,7 +206,7 @@ func (s *CreateTaskReq) Decode(d *jx.Decoder) error {
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [1]uint8{
-		0b00000111,
+		0b00000011,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.

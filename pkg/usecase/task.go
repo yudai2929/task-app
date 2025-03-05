@@ -29,10 +29,9 @@ func NewTaskUsecase(tr repository.TaskRepository, ar repository.TaskAssigneeRepo
 }
 
 type CreateTaskInput struct {
-	UserID      string            `validate:"required"`
-	Title       string            `validate:"required"`
-	Description string            `validate:"required"`
-	Status      entity.TaskStatus `validate:"required"`
+	UserID      string `validate:"required"`
+	Title       string `validate:"required"`
+	Description string `validate:"required"`
 	DueDate     *time.Time
 }
 
@@ -50,7 +49,7 @@ func (u *taskUsecase) CreateTask(ctx context.Context, in *CreateTaskInput) (*Cre
 		UserID:      in.UserID,
 		Title:       in.Title,
 		Description: in.Description,
-		Status:      in.Status,
+		Status:      entity.TaskStatusTodo,
 		DueDate:     in.DueDate,
 	}
 

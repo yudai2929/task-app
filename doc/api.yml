@@ -136,8 +136,6 @@ paths:
                   type: string
                 description:
                   type: string
-                status:
-                  type: integer
                 due_date:
                   type: string
                   format: date-time

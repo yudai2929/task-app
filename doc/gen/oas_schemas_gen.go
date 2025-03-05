@@ -45,7 +45,6 @@ func (s *BearerAuth) SetToken(val string) {
 type CreateTaskReq struct {
 	Title       string      `json:"title"`
 	Description string      `json:"description"`
-	Status      int         `json:"status"`
 	DueDate     OptDateTime `json:"due_date"`
 }
 
@@ -57,11 +56,6 @@ func (s *CreateTaskReq) GetTitle() string {
 // GetDescription returns the value of Description.
 func (s *CreateTaskReq) GetDescription() string {
 	return s.Description
-}
-
-// GetStatus returns the value of Status.
-func (s *CreateTaskReq) GetStatus() int {
-	return s.Status
 }
 
 // GetDueDate returns the value of DueDate.
@@ -77,11 +71,6 @@ func (s *CreateTaskReq) SetTitle(val string) {
 // SetDescription sets the value of Description.
 func (s *CreateTaskReq) SetDescription(val string) {
 	s.Description = val
-}
-
-// SetStatus sets the value of Status.
-func (s *CreateTaskReq) SetStatus(val int) {
-	s.Status = val
 }
 
 // SetDueDate sets the value of DueDate.
