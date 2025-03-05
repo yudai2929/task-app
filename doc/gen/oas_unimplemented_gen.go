@@ -15,7 +15,7 @@ var _ Handler = UnimplementedHandler{}
 
 // AssignTask implements assignTask operation.
 //
-// Assign multiple users to a task.
+// Assign users to a task.
 //
 // POST /v1/tasks/{id}/assign
 func (UnimplementedHandler) AssignTask(ctx context.Context, req *AssignTaskReq, params AssignTaskParams) error {
@@ -24,16 +24,16 @@ func (UnimplementedHandler) AssignTask(ctx context.Context, req *AssignTaskReq, 
 
 // CreateTask implements createTask operation.
 //
-// Create a new task.
+// Create a task.
 //
 // POST /v1/tasks
-func (UnimplementedHandler) CreateTask(ctx context.Context, req *Task) (r *Task, _ error) {
+func (UnimplementedHandler) CreateTask(ctx context.Context, req *CreateTaskReq) (r *Task, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
 // DeleteTask implements deleteTask operation.
 //
-// Delete an existing task.
+// Delete a task.
 //
 // DELETE /v1/tasks/{id}
 func (UnimplementedHandler) DeleteTask(ctx context.Context, params DeleteTaskParams) error {
@@ -42,7 +42,7 @@ func (UnimplementedHandler) DeleteTask(ctx context.Context, params DeleteTaskPar
 
 // GetTask implements getTask operation.
 //
-// Retrieve task details by ID.
+// Get a task.
 //
 // GET /v1/tasks/{id}
 func (UnimplementedHandler) GetTask(ctx context.Context, params GetTaskParams) (r *Task, _ error) {
@@ -51,7 +51,7 @@ func (UnimplementedHandler) GetTask(ctx context.Context, params GetTaskParams) (
 
 // ListTasks implements listTasks operation.
 //
-// Retrieve a list of tasks.
+// Get task list.
 //
 // GET /v1/tasks
 func (UnimplementedHandler) ListTasks(ctx context.Context) (r []Task, _ error) {
@@ -60,7 +60,7 @@ func (UnimplementedHandler) ListTasks(ctx context.Context) (r []Task, _ error) {
 
 // Login implements login operation.
 //
-// Authenticate user and return JWT.
+// User login.
 //
 // POST /v1/login
 func (UnimplementedHandler) Login(ctx context.Context, req *LoginReq) (r *LoginOK, _ error) {
@@ -69,7 +69,7 @@ func (UnimplementedHandler) Login(ctx context.Context, req *LoginReq) (r *LoginO
 
 // SignUp implements signUp operation.
 //
-// Register a new user.
+// User signup.
 //
 // POST /v1/signup
 func (UnimplementedHandler) SignUp(ctx context.Context, req *SignUpReq) (r *SignUpCreated, _ error) {
@@ -78,10 +78,10 @@ func (UnimplementedHandler) SignUp(ctx context.Context, req *SignUpReq) (r *Sign
 
 // UpdateTask implements updateTask operation.
 //
-// Update an existing task.
+// Update a task.
 //
 // PUT /v1/tasks/{id}
-func (UnimplementedHandler) UpdateTask(ctx context.Context, req *Task, params UpdateTaskParams) (r *Task, _ error) {
+func (UnimplementedHandler) UpdateTask(ctx context.Context, req *UpdateTaskReq, params UpdateTaskParams) (r *Task, _ error) {
 	return r, ht.ErrNotImplemented
 }
 

@@ -10,52 +10,52 @@ import (
 type Handler interface {
 	// AssignTask implements assignTask operation.
 	//
-	// Assign multiple users to a task.
+	// Assign users to a task.
 	//
 	// POST /v1/tasks/{id}/assign
 	AssignTask(ctx context.Context, req *AssignTaskReq, params AssignTaskParams) error
 	// CreateTask implements createTask operation.
 	//
-	// Create a new task.
+	// Create a task.
 	//
 	// POST /v1/tasks
-	CreateTask(ctx context.Context, req *Task) (*Task, error)
+	CreateTask(ctx context.Context, req *CreateTaskReq) (*Task, error)
 	// DeleteTask implements deleteTask operation.
 	//
-	// Delete an existing task.
+	// Delete a task.
 	//
 	// DELETE /v1/tasks/{id}
 	DeleteTask(ctx context.Context, params DeleteTaskParams) error
 	// GetTask implements getTask operation.
 	//
-	// Retrieve task details by ID.
+	// Get a task.
 	//
 	// GET /v1/tasks/{id}
 	GetTask(ctx context.Context, params GetTaskParams) (*Task, error)
 	// ListTasks implements listTasks operation.
 	//
-	// Retrieve a list of tasks.
+	// Get task list.
 	//
 	// GET /v1/tasks
 	ListTasks(ctx context.Context) ([]Task, error)
 	// Login implements login operation.
 	//
-	// Authenticate user and return JWT.
+	// User login.
 	//
 	// POST /v1/login
 	Login(ctx context.Context, req *LoginReq) (*LoginOK, error)
 	// SignUp implements signUp operation.
 	//
-	// Register a new user.
+	// User signup.
 	//
 	// POST /v1/signup
 	SignUp(ctx context.Context, req *SignUpReq) (*SignUpCreated, error)
 	// UpdateTask implements updateTask operation.
 	//
-	// Update an existing task.
+	// Update a task.
 	//
 	// PUT /v1/tasks/{id}
-	UpdateTask(ctx context.Context, req *Task, params UpdateTaskParams) (*Task, error)
+	UpdateTask(ctx context.Context, req *UpdateTaskReq, params UpdateTaskParams) (*Task, error)
 	// NewError creates *ErrorStatusCode from error returned by handler.
 	//
 	// Used for common default response.
@@ -65,18 +65,20 @@ type Handler interface {
 // Server implements http server based on OpenAPI v3 specification and
 // calls Handler to handle requests.
 type Server struct {
-	h Handler
+	h   Handler
+	sec SecurityHandler
 	baseServer
 }
 
 // NewServer creates new Server.
-func NewServer(h Handler, opts ...ServerOption) (*Server, error) {
+func NewServer(h Handler, sec SecurityHandler, opts ...ServerOption) (*Server, error) {
 	s, err := newServerConfig(opts...).baseServer()
 	if err != nil {
 		return nil, err
 	}
 	return &Server{
 		h:          h,
+		sec:        sec,
 		baseServer: s,
 	}, nil
 }

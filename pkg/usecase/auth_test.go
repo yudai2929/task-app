@@ -14,7 +14,7 @@ import (
 
 func TestAuthUsecase_SignUp(t *testing.T) {
 	ctx := context.Background()
-	in := &SingUpInput{
+	in := &SignUpInput{
 		Email:    "hoge@hoge.com",
 		Name:     "hoge",
 		Password: "password",
@@ -27,8 +27,8 @@ func TestAuthUsecase_SignUp(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		in      *SingUpInput
-		out     *SingUpOutput
+		in      *SignUpInput
+		out     *SignUpOutput
 		errcode codes.Code
 		ctx     context.Context
 		wantErr bool
@@ -36,7 +36,7 @@ func TestAuthUsecase_SignUp(t *testing.T) {
 	}{
 		{
 			name:    "err: invalid",
-			in:      &SingUpInput{},
+			in:      &SignUpInput{},
 			errcode: codes.CodeInvalidArgument,
 			ctx:     ctx,
 			wantErr: true,
@@ -65,7 +65,7 @@ func TestAuthUsecase_SignUp(t *testing.T) {
 		{
 			name: "success",
 			in:   in,
-			out: &SingUpOutput{
+			out: &SignUpOutput{
 				User: user,
 				JWT:  "jwt",
 			},

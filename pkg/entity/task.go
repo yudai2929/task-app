@@ -35,4 +35,8 @@ func (ts TaskStatus) String() string {
 	}
 }
 
+func (ts TaskStatus) Int() int {
+	return int(ts)
+}
+
 type Tasks []*Task

@@ -28,6 +28,56 @@ func (s *AssignTaskReq) SetUserIds(val []string) {
 	s.UserIds = val
 }
 
+type BearerAuth struct {
+	Token string
+}
+
+// GetToken returns the value of Token.
+func (s *BearerAuth) GetToken() string {
+	return s.Token
+}
+
+// SetToken sets the value of Token.
+func (s *BearerAuth) SetToken(val string) {
+	s.Token = val
+}
+
+type CreateTaskReq struct {
+	Title       string      `json:"title"`
+	Description string      `json:"description"`
+	DueDate     OptDateTime `json:"due_date"`
+}
+
+// GetTitle returns the value of Title.
+func (s *CreateTaskReq) GetTitle() string {
+	return s.Title
+}
+
+// GetDescription returns the value of Description.
+func (s *CreateTaskReq) GetDescription() string {
+	return s.Description
+}
+
+// GetDueDate returns the value of DueDate.
+func (s *CreateTaskReq) GetDueDate() OptDateTime {
+	return s.DueDate
+}
+
+// SetTitle sets the value of Title.
+func (s *CreateTaskReq) SetTitle(val string) {
+	s.Title = val
+}
+
+// SetDescription sets the value of Description.
+func (s *CreateTaskReq) SetDescription(val string) {
+	s.Description = val
+}
+
+// SetDueDate sets the value of DueDate.
+func (s *CreateTaskReq) SetDueDate(val OptDateTime) {
+	s.DueDate = val
+}
+
 // DeleteTaskNoContent is response for DeleteTask operation.
 type DeleteTaskNoContent struct{}
 
@@ -285,6 +335,53 @@ func (s *Task) SetStatus(val int) {
 
 // SetDueDate sets the value of DueDate.
 func (s *Task) SetDueDate(val OptDateTime) {
+	s.DueDate = val
+}
+
+type UpdateTaskReq struct {
+	Title       string      `json:"title"`
+	Description string      `json:"description"`
+	Status      int         `json:"status"`
+	DueDate     OptDateTime `json:"due_date"`
+}
+
+// GetTitle returns the value of Title.
+func (s *UpdateTaskReq) GetTitle() string {
+	return s.Title
+}
+
+// GetDescription returns the value of Description.
+func (s *UpdateTaskReq) GetDescription() string {
+	return s.Description
+}
+
+// GetStatus returns the value of Status.
+func (s *UpdateTaskReq) GetStatus() int {
+	return s.Status
+}
+
+// GetDueDate returns the value of DueDate.
+func (s *UpdateTaskReq) GetDueDate() OptDateTime {
+	return s.DueDate
+}
+
+// SetTitle sets the value of Title.
+func (s *UpdateTaskReq) SetTitle(val string) {
+	s.Title = val
+}
+
+// SetDescription sets the value of Description.
+func (s *UpdateTaskReq) SetDescription(val string) {
+	s.Description = val
+}
+
+// SetStatus sets the value of Status.
+func (s *UpdateTaskReq) SetStatus(val int) {
+	s.Status = val
+}
+
+// SetDueDate sets the value of DueDate.
+func (s *UpdateTaskReq) SetDueDate(val OptDateTime) {
 	s.DueDate = val
 }
 

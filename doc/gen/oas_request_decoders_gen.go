@@ -72,6 +72,14 @@ func (s *Server) decodeAssignTaskRequest(r *http.Request) (
 			}
 			return req, close, err
 		}
+		if err := func() error {
+			if err := request.Validate(); err != nil {
+				return err
+			}
+			return nil
+		}(); err != nil {
+			return req, close, errors.Wrap(err, "validate")
+		}
 		return &request, close, nil
 	default:
 		return req, close, validate.InvalidContentType(ct)
@@ -79,7 +87,7 @@ func (s *Server) decodeAssignTaskRequest(r *http.Request) (
 }
 
 func (s *Server) decodeCreateTaskRequest(r *http.Request) (
-	req *Task,
+	req *CreateTaskReq,
 	close func() error,
 	rerr error,
 ) {
@@ -118,7 +126,7 @@ func (s *Server) decodeCreateTaskRequest(r *http.Request) (
 
 		d := jx.DecodeBytes(buf)
 
-		var request Task
+		var request CreateTaskReq
 		if err := func() error {
 			if err := request.Decode(d); err != nil {
 				return err
@@ -268,7 +276,7 @@ func (s *Server) decodeSignUpRequest(r *http.Request) (
 }
 
 func (s *Server) decodeUpdateTaskRequest(r *http.Request) (
-	req *Task,
+	req *UpdateTaskReq,
 	close func() error,
 	rerr error,
 ) {
@@ -307,7 +315,7 @@ func (s *Server) decodeUpdateTaskRequest(r *http.Request) (
 
 		d := jx.DecodeBytes(buf)
 
-		var request Task
+		var request UpdateTaskReq
 		if err := func() error {
 			if err := request.Decode(d); err != nil {
 				return err

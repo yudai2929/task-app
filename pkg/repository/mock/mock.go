@@ -106,3 +106,156 @@ func NewMockTaskRepository(ctrl *gomock.Controller) *MockTaskRepository {
 func (m *MockTaskRepository) EXPECT() *MockTaskRepositoryMockRecorder {
 	return m.recorder
 }
+
+// CreateTask mocks base method.
+func (m *MockTaskRepository) CreateTask(ctx context.Context, task *entity.Task) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateTask", ctx, task)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CreateTask indicates an expected call of CreateTask.
+func (mr *MockTaskRepositoryMockRecorder) CreateTask(ctx, task any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateTask", reflect.TypeOf((*MockTaskRepository)(nil).CreateTask), ctx, task)
+}
+
+// DeleteTask mocks base method.
+func (m *MockTaskRepository) DeleteTask(ctx context.Context, id string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteTask", ctx, id)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteTask indicates an expected call of DeleteTask.
+func (mr *MockTaskRepositoryMockRecorder) DeleteTask(ctx, id any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteTask", reflect.TypeOf((*MockTaskRepository)(nil).DeleteTask), ctx, id)
+}
+
+// GetTask mocks base method.
+func (m *MockTaskRepository) GetTask(ctx context.Context, id string) (*entity.Task, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetTask", ctx, id)
+	ret0, _ := ret[0].(*entity.Task)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetTask indicates an expected call of GetTask.
+func (mr *MockTaskRepositoryMockRecorder) GetTask(ctx, id any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTask", reflect.TypeOf((*MockTaskRepository)(nil).GetTask), ctx, id)
+}
+
+// ListMyTasks mocks base method.
+func (m *MockTaskRepository) ListMyTasks(ctx context.Context, userID string) (entity.Tasks, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListMyTasks", ctx, userID)
+	ret0, _ := ret[0].(entity.Tasks)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListMyTasks indicates an expected call of ListMyTasks.
+func (mr *MockTaskRepositoryMockRecorder) ListMyTasks(ctx, userID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListMyTasks", reflect.TypeOf((*MockTaskRepository)(nil).ListMyTasks), ctx, userID)
+}
+
+// ListTasks mocks base method.
+func (m *MockTaskRepository) ListTasks(ctx context.Context) (entity.Tasks, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListTasks", ctx)
+	ret0, _ := ret[0].(entity.Tasks)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListTasks indicates an expected call of ListTasks.
+func (mr *MockTaskRepositoryMockRecorder) ListTasks(ctx any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListTasks", reflect.TypeOf((*MockTaskRepository)(nil).ListTasks), ctx)
+}
+
+// UpdateTask mocks base method.
+func (m *MockTaskRepository) UpdateTask(ctx context.Context, task *entity.Task) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateTask", ctx, task)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateTask indicates an expected call of UpdateTask.
+func (mr *MockTaskRepositoryMockRecorder) UpdateTask(ctx, task any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateTask", reflect.TypeOf((*MockTaskRepository)(nil).UpdateTask), ctx, task)
+}
+
+// MockTaskAssigneeRepository is a mock of TaskAssigneeRepository interface.
+type MockTaskAssigneeRepository struct {
+	ctrl     *gomock.Controller
+	recorder *MockTaskAssigneeRepositoryMockRecorder
+}
+
+// MockTaskAssigneeRepositoryMockRecorder is the mock recorder for MockTaskAssigneeRepository.
+type MockTaskAssigneeRepositoryMockRecorder struct {
+	mock *MockTaskAssigneeRepository
+}
+
+// NewMockTaskAssigneeRepository creates a new mock instance.
+func NewMockTaskAssigneeRepository(ctrl *gomock.Controller) *MockTaskAssigneeRepository {
+	mock := &MockTaskAssigneeRepository{ctrl: ctrl}
+	mock.recorder = &MockTaskAssigneeRepositoryMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockTaskAssigneeRepository) EXPECT() *MockTaskAssigneeRepositoryMockRecorder {
+	return m.recorder
+}
+
+// BatchCreate mocks base method.
+func (m *MockTaskAssigneeRepository) BatchCreate(ctx context.Context, assignees entity.TaskAssignees) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "BatchCreate", ctx, assignees)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// BatchCreate indicates an expected call of BatchCreate.
+func (mr *MockTaskAssigneeRepositoryMockRecorder) BatchCreate(ctx, assignees any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BatchCreate", reflect.TypeOf((*MockTaskAssigneeRepository)(nil).BatchCreate), ctx, assignees)
+}
+
+// BatchDeleteByTaskID mocks base method.
+func (m *MockTaskAssigneeRepository) BatchDeleteByTaskID(ctx context.Context, taskID string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "BatchDeleteByTaskID", ctx, taskID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// BatchDeleteByTaskID indicates an expected call of BatchDeleteByTaskID.
+func (mr *MockTaskAssigneeRepositoryMockRecorder) BatchDeleteByTaskID(ctx, taskID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BatchDeleteByTaskID", reflect.TypeOf((*MockTaskAssigneeRepository)(nil).BatchDeleteByTaskID), ctx, taskID)
+}
+
+// GetTaskAssignee mocks base method.
+func (m *MockTaskAssigneeRepository) GetTaskAssignee(ctx context.Context, taskID, userID string) (*entity.TaskAssignee, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetTaskAssignee", ctx, taskID, userID)
+	ret0, _ := ret[0].(*entity.TaskAssignee)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetTaskAssignee indicates an expected call of GetTaskAssignee.
+func (mr *MockTaskAssigneeRepositoryMockRecorder) GetTaskAssignee(ctx, taskID, userID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTaskAssignee", reflect.TypeOf((*MockTaskAssigneeRepository)(nil).GetTaskAssignee), ctx, taskID, userID)
+}

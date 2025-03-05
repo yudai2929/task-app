@@ -17,6 +17,7 @@ import (
 
 	"github.com/ogen-go/ogen/conv"
 	ht "github.com/ogen-go/ogen/http"
+	"github.com/ogen-go/ogen/ogenerrors"
 	"github.com/ogen-go/ogen/otelogen"
 	"github.com/ogen-go/ogen/uri"
 )
@@ -30,57 +31,58 @@ func trimTrailingSlashes(u *url.URL) {
 type Invoker interface {
 	// AssignTask invokes assignTask operation.
 	//
-	// Assign multiple users to a task.
+	// Assign users to a task.
 	//
 	// POST /v1/tasks/{id}/assign
 	AssignTask(ctx context.Context, request *AssignTaskReq, params AssignTaskParams) error
 	// CreateTask invokes createTask operation.
 	//
-	// Create a new task.
+	// Create a task.
 	//
 	// POST /v1/tasks
-	CreateTask(ctx context.Context, request *Task) (*Task, error)
+	CreateTask(ctx context.Context, request *CreateTaskReq) (*Task, error)
 	// DeleteTask invokes deleteTask operation.
 	//
-	// Delete an existing task.
+	// Delete a task.
 	//
 	// DELETE /v1/tasks/{id}
 	DeleteTask(ctx context.Context, params DeleteTaskParams) error
 	// GetTask invokes getTask operation.
 	//
-	// Retrieve task details by ID.
+	// Get a task.
 	//
 	// GET /v1/tasks/{id}
 	GetTask(ctx context.Context, params GetTaskParams) (*Task, error)
 	// ListTasks invokes listTasks operation.
 	//
-	// Retrieve a list of tasks.
+	// Get task list.
 	//
 	// GET /v1/tasks
 	ListTasks(ctx context.Context) ([]Task, error)
 	// Login invokes login operation.
 	//
-	// Authenticate user and return JWT.
+	// User login.
 	//
 	// POST /v1/login
 	Login(ctx context.Context, request *LoginReq) (*LoginOK, error)
 	// SignUp invokes signUp operation.
 	//
-	// Register a new user.
+	// User signup.
 	//
 	// POST /v1/signup
 	SignUp(ctx context.Context, request *SignUpReq) (*SignUpCreated, error)
 	// UpdateTask invokes updateTask operation.
 	//
-	// Update an existing task.
+	// Update a task.
 	//
 	// PUT /v1/tasks/{id}
-	UpdateTask(ctx context.Context, request *Task, params UpdateTaskParams) (*Task, error)
+	UpdateTask(ctx context.Context, request *UpdateTaskReq, params UpdateTaskParams) (*Task, error)
 }
 
 // Client implements OAS client.
 type Client struct {
 	serverURL *url.URL
+	sec       SecuritySource
 	baseClient
 }
 type errorHandler interface {
@@ -93,7 +95,7 @@ var _ Handler = struct {
 }{}
 
 // NewClient initializes new Client defined by OAS.
-func NewClient(serverURL string, opts ...ClientOption) (*Client, error) {
+func NewClient(serverURL string, sec SecuritySource, opts ...ClientOption) (*Client, error) {
 	u, err := url.Parse(serverURL)
 	if err != nil {
 		return nil, err
@@ -106,6 +108,7 @@ func NewClient(serverURL string, opts ...ClientOption) (*Client, error) {
 	}
 	return &Client{
 		serverURL:  u,
+		sec:        sec,
 		baseClient: c,
 	}, nil
 }
@@ -127,7 +130,7 @@ func (c *Client) requestURL(ctx context.Context) *url.URL {
 
 // AssignTask invokes assignTask operation.
 //
-// Assign multiple users to a task.
+// Assign users to a task.
 //
 // POST /v1/tasks/{id}/assign
 func (c *Client) AssignTask(ctx context.Context, request *AssignTaskReq, params AssignTaskParams) error {
@@ -203,6 +206,39 @@ func (c *Client) sendAssignTask(ctx context.Context, request *AssignTaskReq, par
 		return res, errors.Wrap(err, "encode request")
 	}
 
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:BearerAuth"
+			switch err := c.securityBearerAuth(ctx, AssignTaskOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"BearerAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
 	stage = "SendRequest"
 	resp, err := c.cfg.Client.Do(r)
 	if err != nil {
@@ -221,15 +257,15 @@ func (c *Client) sendAssignTask(ctx context.Context, request *AssignTaskReq, par
 
 // CreateTask invokes createTask operation.
 //
-// Create a new task.
+// Create a task.
 //
 // POST /v1/tasks
-func (c *Client) CreateTask(ctx context.Context, request *Task) (*Task, error) {
+func (c *Client) CreateTask(ctx context.Context, request *CreateTaskReq) (*Task, error) {
 	res, err := c.sendCreateTask(ctx, request)
 	return res, err
 }
 
-func (c *Client) sendCreateTask(ctx context.Context, request *Task) (res *Task, err error) {
+func (c *Client) sendCreateTask(ctx context.Context, request *CreateTaskReq) (res *Task, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("createTask"),
 		semconv.HTTPRequestMethodKey.String("POST"),
@@ -278,6 +314,39 @@ func (c *Client) sendCreateTask(ctx context.Context, request *Task) (res *Task, 
 		return res, errors.Wrap(err, "encode request")
 	}
 
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:BearerAuth"
+			switch err := c.securityBearerAuth(ctx, CreateTaskOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"BearerAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
 	stage = "SendRequest"
 	resp, err := c.cfg.Client.Do(r)
 	if err != nil {
@@ -296,7 +365,7 @@ func (c *Client) sendCreateTask(ctx context.Context, request *Task) (res *Task, 
 
 // DeleteTask invokes deleteTask operation.
 //
-// Delete an existing task.
+// Delete a task.
 //
 // DELETE /v1/tasks/{id}
 func (c *Client) DeleteTask(ctx context.Context, params DeleteTaskParams) error {
@@ -368,6 +437,39 @@ func (c *Client) sendDeleteTask(ctx context.Context, params DeleteTaskParams) (r
 		return res, errors.Wrap(err, "create request")
 	}
 
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:BearerAuth"
+			switch err := c.securityBearerAuth(ctx, DeleteTaskOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"BearerAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
 	stage = "SendRequest"
 	resp, err := c.cfg.Client.Do(r)
 	if err != nil {
@@ -386,7 +488,7 @@ func (c *Client) sendDeleteTask(ctx context.Context, params DeleteTaskParams) (r
 
 // GetTask invokes getTask operation.
 //
-// Retrieve task details by ID.
+// Get a task.
 //
 // GET /v1/tasks/{id}
 func (c *Client) GetTask(ctx context.Context, params GetTaskParams) (*Task, error) {
@@ -458,6 +560,39 @@ func (c *Client) sendGetTask(ctx context.Context, params GetTaskParams) (res *Ta
 		return res, errors.Wrap(err, "create request")
 	}
 
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:BearerAuth"
+			switch err := c.securityBearerAuth(ctx, GetTaskOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"BearerAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
 	stage = "SendRequest"
 	resp, err := c.cfg.Client.Do(r)
 	if err != nil {
@@ -476,7 +611,7 @@ func (c *Client) sendGetTask(ctx context.Context, params GetTaskParams) (res *Ta
 
 // ListTasks invokes listTasks operation.
 //
-// Retrieve a list of tasks.
+// Get task list.
 //
 // GET /v1/tasks
 func (c *Client) ListTasks(ctx context.Context) ([]Task, error) {
@@ -530,6 +665,39 @@ func (c *Client) sendListTasks(ctx context.Context) (res []Task, err error) {
 		return res, errors.Wrap(err, "create request")
 	}
 
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:BearerAuth"
+			switch err := c.securityBearerAuth(ctx, ListTasksOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"BearerAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
 	stage = "SendRequest"
 	resp, err := c.cfg.Client.Do(r)
 	if err != nil {
@@ -548,7 +716,7 @@ func (c *Client) sendListTasks(ctx context.Context) (res []Task, err error) {
 
 // Login invokes login operation.
 //
-// Authenticate user and return JWT.
+// User login.
 //
 // POST /v1/login
 func (c *Client) Login(ctx context.Context, request *LoginReq) (*LoginOK, error) {
@@ -623,7 +791,7 @@ func (c *Client) sendLogin(ctx context.Context, request *LoginReq) (res *LoginOK
 
 // SignUp invokes signUp operation.
 //
-// Register a new user.
+// User signup.
 //
 // POST /v1/signup
 func (c *Client) SignUp(ctx context.Context, request *SignUpReq) (*SignUpCreated, error) {
@@ -698,15 +866,15 @@ func (c *Client) sendSignUp(ctx context.Context, request *SignUpReq) (res *SignU
 
 // UpdateTask invokes updateTask operation.
 //
-// Update an existing task.
+// Update a task.
 //
 // PUT /v1/tasks/{id}
-func (c *Client) UpdateTask(ctx context.Context, request *Task, params UpdateTaskParams) (*Task, error) {
+func (c *Client) UpdateTask(ctx context.Context, request *UpdateTaskReq, params UpdateTaskParams) (*Task, error) {
 	res, err := c.sendUpdateTask(ctx, request, params)
 	return res, err
 }
 
-func (c *Client) sendUpdateTask(ctx context.Context, request *Task, params UpdateTaskParams) (res *Task, err error) {
+func (c *Client) sendUpdateTask(ctx context.Context, request *UpdateTaskReq, params UpdateTaskParams) (res *Task, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("updateTask"),
 		semconv.HTTPRequestMethodKey.String("PUT"),
@@ -771,6 +939,39 @@ func (c *Client) sendUpdateTask(ctx context.Context, request *Task, params Updat
 	}
 	if err := encodeUpdateTaskRequest(request, r); err != nil {
 		return res, errors.Wrap(err, "encode request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:BearerAuth"
+			switch err := c.securityBearerAuth(ctx, UpdateTaskOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"BearerAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
 	}
 
 	stage = "SendRequest"

@@ -1,13 +1,7 @@
 openapi: 3.0.3
 info:
   title: Task Management API
-  description: |-
-    API documentation for task management system.
-  termsOfService: https://localhost:8080
-  contact:
-    email: support@example.com
-  license:
-    name: Apache 2.0
+  description: API documentation for task management system.
   version: 1.0.0
 servers:
   - url: http://localhost:8080
@@ -22,7 +16,6 @@ paths:
       tags:
         - Authentication
       summary: User signup
-      description: Register a new user
       operationId: signUp
       requestBody:
         required: true
@@ -62,12 +55,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+
   /v1/login:
     post:
       tags:
         - Authentication
       summary: User login
-      description: Authenticate user and return JWT
       operationId: login
       requestBody:
         required: true
@@ -101,12 +94,14 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+
   /v1/tasks:
     get:
+      security:
+        - BearerAuth: []
       tags:
         - Tasks
       summary: Get task list
-      description: Retrieve a list of tasks
       operationId: listTasks
       responses:
         "200":
@@ -124,17 +119,30 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
     post:
+      security:
+        - BearerAuth: []
       tags:
         - Tasks
       summary: Create a task
-      description: Create a new task
       operationId: createTask
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Task"
+              type: object
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                due_date:
+                  type: string
+                  format: date-time
+              required:
+                - title
+                - description
+                - status
       responses:
         "201":
           description: Task created successfully
@@ -148,12 +156,14 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+
   /v1/tasks/{id}:
     get:
+      security:
+        - BearerAuth: []
       tags:
         - Tasks
       summary: Get a task
-      description: Retrieve task details by ID
       operationId: getTask
       parameters:
         - name: id
@@ -175,10 +185,11 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
     put:
+      security:
+        - BearerAuth: []
       tags:
         - Tasks
       summary: Update a task
-      description: Update an existing task
       operationId: updateTask
       parameters:
         - name: id
@@ -191,7 +202,21 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Task"
+              type: object
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                status:
+                  type: integer
+                due_date:
+                  type: string
+                  format: date-time
+              required:
+                - title
+                - description
+                - status
       responses:
         "200":
           description: Task updated successfully
@@ -205,11 +230,13 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+
     delete:
+      security:
+        - BearerAuth: []
       tags:
         - Tasks
       summary: Delete a task
-      description: Delete an existing task
       operationId: deleteTask
       parameters:
         - name: id
@@ -228,10 +255,11 @@ paths:
                 $ref: "#/components/schemas/Error"
   /v1/tasks/{id}/assign:
     post:
+      security:
+        - BearerAuth: []
       tags:
         - Tasks
       summary: Assign users to a task
-      description: Assign multiple users to a task
       operationId: assignTask
       parameters:
         - name: id
@@ -250,6 +278,8 @@ paths:
                   type: array
                   items:
                     type: string
+              required:
+                - user_ids
       responses:
         "200":
           description: Users assigned successfully
@@ -260,6 +290,12 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
   schemas:
     User:
       type: object
@@ -274,6 +310,7 @@ components:
         - id
         - name
         - email
+
     Task:
       type: object
       properties:
