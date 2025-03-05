@@ -36,6 +36,24 @@ docker を使わずに go のサーバーを立ち上げる場合
 make run_server
 ```
 
+### サーバー接続確認
+
+以下のコマンドを実行してヘルスチェックエンドポイントを確認：
+
+```
+curl -X 'GET' \
+  'http://localhost:8080/v1/health' \
+  -H 'accept: application/json'
+```
+
+```
+{
+  "status": "ok"
+}
+```
+
+と表示されれば問題なく接続できている
+
 ### PostgreSQL に接続
 
 ```
