@@ -1,7 +1,10 @@
 # タスク管理アプリ
 
+LayerX 様 インターンの課題
+
 ## 設計
 こちらの参照
+
 https://github.com/yudai2929/task-app/blob/main/DESIGN.md
 
 ## 環境
