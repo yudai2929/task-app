@@ -1,3 +1,5 @@
+//go:build integration || !unit
+
 package repository
 
 import (
@@ -12,7 +14,6 @@ import (
 )
 
 func TestUserRepository_CRUD(t *testing.T) {
-	t.Parallel()
 	ctx := context.Background()
 	repo := NewUserRepository(db)
 
