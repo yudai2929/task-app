@@ -22,13 +22,26 @@ func newAuthUsecaseMock(mocks *mocks) *authUsecase {
 	}
 }
 
+func newTaskUsecaseMock(mocks *mocks) *taskUsecase {
+	return &taskUsecase{
+		uuid:     func() string { return "uuid" },
+		tr:       mocks.tr,
+		ar:       mocks.ar,
+		validate: validator.New(),
+	}
+}
+
 type mocks struct {
 	ur *mock.MockUserRepository
+	tr *mock.MockTaskRepository
+	ar *mock.MockTaskAssigneeRepository
 }
 
 func newMocks(t *testing.T) *mocks {
 	ctrl := gomock.NewController(t)
 	return &mocks{
 		ur: mock.NewMockUserRepository(ctrl),
+		tr: mock.NewMockTaskRepository(ctrl),
+		ar: mock.NewMockTaskAssigneeRepository(ctrl),
 	}
 }
