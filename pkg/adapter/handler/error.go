@@ -9,10 +9,16 @@ import (
 
 func (h *Handler) NewError(ctx context.Context, err error) *api.ErrorStatusCode {
 	code := errors.Code(err)
+
+	sc := code.HTTPStatus()
+	msg := code.String()
+	if code.HTTPStatus() < 500 {
+		msg = err.Error()
+	}
 	return &api.ErrorStatusCode{
-		StatusCode: code.HTTPStatus(),
+		StatusCode: sc,
 		Response: api.Error{
-			Message: code.String(),
+			Message: msg,
 		},
 	}
 }
