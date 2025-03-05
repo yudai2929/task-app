@@ -24,8 +24,7 @@ type TaskRepository interface {
 }
 
 type TaskAssigneeRepository interface {
-	BatchCreate(ctx context.Context, assignees entity.TaskAssignees) error
-	BatchDeleteByTaskID(ctx context.Context, taskID string) error
+	UpdateTaskAssignees(ctx context.Context, taskID string, userIDs []string) error
 	GetTaskAssignee(ctx context.Context, taskID, userID string) (*entity.TaskAssignee, error)
 }
 

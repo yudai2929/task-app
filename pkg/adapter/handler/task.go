@@ -83,7 +83,13 @@ func (h *Handler) DeleteTask(ctx context.Context, params api.DeleteTaskParams) e
 }
 
 func (h *Handler) AssignTask(ctx context.Context, req *api.AssignTaskReq, params api.AssignTaskParams) error {
-	return nil
+	userID := UserIDFromContext(ctx)
+	in := &usecase.AssignTaskInput{
+		UserID:      userID,
+		TaskID:      params.ID,
+		AssigneeIDs: req.GetUserIds(),
+	}
+	return h.tu.AssignTask(ctx, in)
 }
 
 func (h *Handler) convertToAPITask(task *entity.Task) *api.Task {

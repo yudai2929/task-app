@@ -93,6 +93,20 @@ func (m *MockTaskUsecase) EXPECT() *MockTaskUsecaseMockRecorder {
 	return m.recorder
 }
 
+// AssignTask mocks base method.
+func (m *MockTaskUsecase) AssignTask(ctx context.Context, in *usecase.AssignTaskInput) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AssignTask", ctx, in)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// AssignTask indicates an expected call of AssignTask.
+func (mr *MockTaskUsecaseMockRecorder) AssignTask(ctx, in any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AssignTask", reflect.TypeOf((*MockTaskUsecase)(nil).AssignTask), ctx, in)
+}
+
 // CreateTask mocks base method.
 func (m *MockTaskUsecase) CreateTask(ctx context.Context, in *usecase.CreateTaskInput) (*usecase.CreateTaskOutput, error) {
 	m.ctrl.T.Helper()

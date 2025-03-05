@@ -190,3 +190,28 @@ func (u *taskUsecase) DeleteTask(ctx context.Context, in *DeleteTaskInput) error
 	}
 	return nil
 }
+
+type AssignTaskInput struct {
+	UserID      string   `validate:"required"`
+	TaskID      string   `validate:"required"`
+	AssigneeIDs []string `validate:"required"`
+}
+
+func (u *taskUsecase) AssignTask(ctx context.Context, in *AssignTaskInput) error {
+	if err := u.validate.Struct(in); err != nil {
+		return errors.Convert(err)
+	}
+	task, err := u.tr.GetTask(ctx, in.TaskID)
+	if err != nil {
+		return errors.Convert(err)
+	}
+
+	if task.UserID != in.UserID {
+		return errors.Newf(codes.CodePermissionDenied, "task assign permission denied")
+	}
+
+	if err := u.ar.UpdateTaskAssignees(ctx, in.TaskID, in.AssigneeIDs); err != nil {
+		return errors.Convert(err)
+	}
+	return nil
+}

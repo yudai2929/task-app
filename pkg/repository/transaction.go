@@ -11,7 +11,7 @@ import (
 type DB interface {
 	ExecContext(context.Context, string, ...interface{}) (sql.Result, error)
 	QueryContext(context.Context, string, ...interface{}) (*sql.Rows, error)
-	QueryRowContext(context.Context, string, ...interface{}) *sql.Row
+	QueryRowContext(context.Context, ...interface{}) *sql.Row
 }
 
 type txKey struct{}
@@ -25,14 +25,7 @@ func getTx(ctx context.Context) (*sql.Tx, bool) {
 	return tx, ok
 }
 
-func getDB(ctx context.Context, db *sql.DB) DB {
-	if tx, ok := getTx(ctx); ok {
-		return tx
-	}
-	return db
-}
-
-func runInTransaction(ctx context.Context, db *sql.DB, fn func(ctx context.Context) error) (err error) {
+func runInTransaction(ctx context.Context, db *sql.DB, fn func(ctx context.Context, db *sql.Tx) error) (err error) {
 	tx, err := db.BeginTx(ctx, nil)
 	if err != nil {
 		return errors.Convert(err)
@@ -53,7 +46,7 @@ func runInTransaction(ctx context.Context, db *sql.DB, fn func(ctx context.Conte
 	}()
 
 	ctx = withTx(ctx, tx)
-	err = fn(ctx)
+	err = fn(ctx, tx)
 	return err
 }
 
@@ -66,5 +59,8 @@ func NewTransactionRepository(db *sql.DB) *transactionRepository {
 }
 
 func (t *transactionRepository) Run(ctx context.Context, fn func(ctx context.Context) error) error {
-	return runInTransaction(ctx, t.db, fn)
+	txFn := func(ctx context.Context, db *sql.Tx) error {
+		return fn(ctx)
+	}
+	return runInTransaction(ctx, t.db, txFn)
 }
