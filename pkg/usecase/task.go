@@ -15,14 +15,16 @@ import (
 type taskUsecase struct {
 	tr       repository.TaskRepository
 	ar       repository.TaskAssigneeRepository
+	txr      repository.TransactionRepository
 	validate *validator.Validate
 	uuid     func() string
 }
 
-func NewTaskUsecase(tr repository.TaskRepository, ar repository.TaskAssigneeRepository) *taskUsecase {
+func NewTaskUsecase(tr repository.TaskRepository, ar repository.TaskAssigneeRepository, txr repository.TransactionRepository) *taskUsecase {
 	return &taskUsecase{
 		tr:       tr,
 		ar:       ar,
+		txr:      txr,
 		validate: validator.New(),
 		uuid:     uuid.NewString,
 	}
@@ -53,11 +55,12 @@ func (u *taskUsecase) CreateTask(ctx context.Context, in *CreateTaskInput) (*Cre
 		DueDate:     in.DueDate,
 	}
 
-	if err := u.tr.CreateTask(ctx, task); err != nil {
+	createdTask, err := u.tr.CreateTask(ctx, task)
+	if err != nil {
 		return nil, errors.Convert(err)
 	}
 
-	return &CreateTaskOutput{Task: task}, nil
+	return &CreateTaskOutput{Task: createdTask}, nil
 }
 
 type GetTaskInput struct {
@@ -69,26 +72,37 @@ type GetTaskOutput struct {
 	Task *entity.Task
 }
 
+func (u *taskUsecase) hasPermission(ctx context.Context, task *entity.Task, userID string) (bool, error) {
+	if task.UserID == userID {
+		return true, nil
+	}
+
+	_, err := u.ar.GetTaskAssignee(ctx, task.ID, userID)
+	if err != nil {
+		if errors.EqualCode(err, codes.CodeNotFound) {
+			return false, nil
+		}
+		return false, errors.Convert(err)
+	}
+
+	return true, nil
+}
+
 func (u *taskUsecase) GetTask(ctx context.Context, in *GetTaskInput) (*GetTaskOutput, error) {
 	if err := u.validate.Struct(in); err != nil {
 		return nil, errors.Convert(err)
 	}
-
 	task, err := u.tr.GetTask(ctx, in.TaskID)
 	if err != nil {
 		return nil, errors.Convert(err)
 	}
 
-	if task.UserID == in.UserID {
-		return &GetTaskOutput{Task: task}, nil
-	}
-
-	_, err = u.ar.GetTaskAssignee(ctx, in.TaskID, in.UserID)
+	ok, err := u.hasPermission(ctx, task, in.UserID)
 	if err != nil {
-		if errors.EqualCode(err, codes.CodeNotFound) {
-			return nil, errors.Newf(codes.CodePermissionDenied, "task permission denied")
-		}
 		return nil, errors.Convert(err)
+	}
+	if !ok {
+		return nil, errors.Newf(codes.CodePermissionDenied, "task permission denied")
 	}
 
 	return &GetTaskOutput{Task: task}, nil
@@ -113,4 +127,66 @@ func (u *taskUsecase) ListTasks(ctx context.Context, in *ListTasksInput) (*ListT
 	}
 
 	return &ListTasksOutput{Tasks: tasks}, nil
+}
+
+type UpdateTaskInput struct {
+	UserID      string `validate:"required"`
+	TaskID      string `validate:"required"`
+	Title       string `validate:"required"`
+	Description string `validate:"required"`
+	Status      int    `validate:"oneof=1 2 3"`
+	DueDate     *time.Time
+}
+
+type UpdateTaskOutput struct {
+	Task *entity.Task
+}
+
+func (u *taskUsecase) UpdateTask(ctx context.Context, in *UpdateTaskInput) (*UpdateTaskOutput, error) {
+	if err := u.validate.Struct(in); err != nil {
+		return nil, errors.Convert(err)
+	}
+	task, err := u.tr.GetTask(ctx, in.TaskID)
+	if err != nil {
+		return nil, errors.Convert(err)
+	}
+
+	ok, err := u.hasPermission(ctx, task, in.UserID)
+	if err != nil {
+		return nil, errors.Convert(err)
+	}
+	if !ok {
+		return nil, errors.Newf(codes.CodePermissionDenied, "task permission denied")
+	}
+
+	task.Update(in.Title, in.Description, entity.TaskStatus(in.Status), in.DueDate)
+	updated, err := u.tr.UpdateTask(ctx, task)
+	if err != nil {
+		return nil, errors.Convert(err)
+	}
+	return &UpdateTaskOutput{Task: updated}, nil
+}
+
+type DeleteTaskInput struct {
+	UserID string `validate:"required"`
+	TaskID string `validate:"required"`
+}
+
+func (u *taskUsecase) DeleteTask(ctx context.Context, in *DeleteTaskInput) error {
+	if err := u.validate.Struct(in); err != nil {
+		return errors.Convert(err)
+	}
+	task, err := u.tr.GetTask(ctx, in.TaskID)
+	if err != nil {
+		return errors.Convert(err)
+	}
+
+	if task.UserID != in.UserID {
+		return errors.Newf(codes.CodePermissionDenied, "task permission denied")
+	}
+
+	if err := u.tr.DeleteTask(ctx, in.TaskID); err != nil {
+		return errors.Convert(err)
+	}
+	return nil
 }

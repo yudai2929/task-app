@@ -21,8 +21,7 @@ func NewTaskRepository(db *sql.DB) *taskRepository {
 }
 
 func (r *taskRepository) GetTask(ctx context.Context, id string) (*entity.Task, error) {
-	db := getDB(ctx, r.db)
-	t, err := xo.TaskByID(ctx, db, id)
+	t, err := xo.TaskByID(ctx, r.db, id)
 	if err != nil {
 		return nil, errors.Convert(err)
 	}
@@ -30,8 +29,7 @@ func (r *taskRepository) GetTask(ctx context.Context, id string) (*entity.Task, 
 	return r.convertTask(t), nil
 }
 
-func (r *taskRepository) CreateTask(ctx context.Context, task *entity.Task) error {
-	db := getDB(ctx, r.db)
+func (r *taskRepository) CreateTask(ctx context.Context, task *entity.Task) (*entity.Task, error) {
 	now := time.Now()
 
 	t := &xo.Task{
@@ -50,17 +48,16 @@ func (r *taskRepository) CreateTask(ctx context.Context, task *entity.Task) erro
 			Valid: true,
 		},
 	}
-	if err := t.Insert(ctx, db); err != nil {
-		return errors.Convert(err)
+	if err := t.Insert(ctx, r.db); err != nil {
+		return nil, errors.Convert(err)
 	}
-	return nil
+	return r.convertTask(t), nil
 }
 
 func (r *taskRepository) ListTasks(ctx context.Context) (entity.Tasks, error) {
-	db := getDB(ctx, r.db)
 	const sqlstr = `SELECT id, user_id, title, description, status, due_date, created_at, updated_at ` +
 		`FROM public.tasks ORDER BY created_at DESC`
-	rows, err := db.QueryContext(ctx, sqlstr)
+	rows, err := r.db.QueryContext(ctx, sqlstr)
 	if err != nil {
 		return nil, errors.Convert(err)
 	}
@@ -81,14 +78,13 @@ func (r *taskRepository) ListTasks(ctx context.Context) (entity.Tasks, error) {
 }
 
 func (r *taskRepository) ListMyTasks(ctx context.Context, userID string) (entity.Tasks, error) {
-	db := getDB(ctx, r.db)
 	const sqlstr = `
 		SELECT DISTINCT t.id, t.user_id, t.title, t.description, t.status, t.due_date, t.created_at, t.updated_at
 		FROM tasks t
 		LEFT JOIN task_assignees ta ON t.id = ta.task_id
 		WHERE t.user_id = $1 OR ta.user_id = $1
 		ORDER BY t.created_at DESC`
-	rows, err := db.QueryContext(ctx, sqlstr, userID)
+	rows, err := r.db.QueryContext(ctx, sqlstr, userID)
 	if err != nil {
 		return nil, errors.Convert(err)
 	}
@@ -108,41 +104,48 @@ func (r *taskRepository) ListMyTasks(ctx context.Context, userID string) (entity
 	return tasks, nil
 }
 
-func (r *taskRepository) UpdateTask(ctx context.Context, task *entity.Task) error {
-	db := getDB(ctx, r.db)
-	t, err := xo.TaskByID(ctx, db, task.ID)
+func (r *taskRepository) UpdateTask(ctx context.Context, task *entity.Task) (*entity.Task, error) {
+	var updatedTask *entity.Task
+	err := runInTransaction(ctx, r.db, func(ctx context.Context) error {
+		t, err := xo.TaskByID(ctx, r.db, task.ID)
+		if err != nil {
+			return errors.Convert(err)
+		}
+
+		t.UserID = task.UserID
+		t.Title = task.Title
+		t.Description = task.Description
+		t.Status = int(task.Status)
+		t.DueDate = convertTime(task.DueDate)
+		t.UpdatedAt = sql.NullTime{
+			Time:  time.Now(),
+			Valid: true,
+		}
+
+		if err := t.Update(ctx, r.db); err != nil {
+			return errors.Convert(err)
+		}
+		updatedTask = r.convertTask(t)
+		return nil
+	})
 	if err != nil {
-		return errors.Convert(err)
+		return nil, err
 	}
-
-	t.UserID = task.UserID
-	t.Title = task.Title
-	t.Description = task.Description
-	t.Status = int(task.Status)
-	t.DueDate = convertTime(task.DueDate)
-	t.UpdatedAt = sql.NullTime{
-		Time:  time.Now(),
-		Valid: true,
-	}
-
-	if err := t.Update(ctx, db); err != nil {
-		return errors.Convert(err)
-	}
-	return nil
+	return updatedTask, nil
 }
 
 func (r *taskRepository) DeleteTask(ctx context.Context, id string) error {
-	db := getDB(ctx, r.db)
-	t, err := xo.TaskByID(ctx, db, id)
-	if err != nil {
-		return errors.Convert(err)
-	}
+	return runInTransaction(ctx, r.db, func(ctx context.Context) error {
+		t, err := xo.TaskByID(ctx, r.db, id)
+		if err != nil {
+			return errors.Convert(err)
+		}
 
-	if err := t.Delete(ctx, db); err != nil {
-		return errors.Convert(err)
-	}
-
-	return nil
+		if err := t.Delete(ctx, r.db); err != nil {
+			return errors.Convert(err)
+		}
+		return nil
+	})
 }
 
 func (r *taskRepository) convertTask(t *xo.Task) *entity.Task {

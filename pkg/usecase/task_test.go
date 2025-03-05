@@ -47,7 +47,7 @@ func TestTaskUsecase_CreateTask(t *testing.T) {
 			ctx:     ctx,
 			wantErr: false,
 			setup: func(mockTaskRepo *mock.MockTaskRepository) {
-				mockTaskRepo.EXPECT().CreateTask(ctx, task).Return(nil)
+				mockTaskRepo.EXPECT().CreateTask(ctx, task).Return(task, nil)
 			},
 		},
 		{
@@ -65,7 +65,7 @@ func TestTaskUsecase_CreateTask(t *testing.T) {
 			ctx:     context.Background(),
 			wantErr: true,
 			setup: func(mockTaskRepo *mock.MockTaskRepository) {
-				mockTaskRepo.EXPECT().CreateTask(ctx, task).Return(errors.New(codes.CodeInternal))
+				mockTaskRepo.EXPECT().CreateTask(ctx, task).Return(nil, errors.New(codes.CodeInternal))
 			},
 		},
 	}
@@ -274,6 +274,190 @@ func TestTaskUsecase_ListTasks(t *testing.T) {
 			}
 			assert.NoError(t, err)
 			assert.Equal(t, tt.out, out)
+		})
+	}
+}
+
+func TestTaskUsecase_UpdateTask(t *testing.T) {
+	t.Parallel()
+	ctx := context.Background()
+	in := &UpdateTaskInput{
+		UserID:      "user1",
+		TaskID:      "task1",
+		Title:       "Updated Task",
+		Description: "This is an updated test task",
+		Status:      entity.TaskStatusInProgress.Int(),
+		DueDate:     nil,
+	}
+	task := &entity.Task{
+		ID:          "task1",
+		UserID:      "user1",
+		Title:       "Updated Task",
+		Description: "This is an updated test task",
+		Status:      entity.TaskStatusInProgress,
+		DueDate:     nil,
+	}
+	out := &UpdateTaskOutput{
+		Task: task,
+	}
+	tests := []struct {
+		name    string
+		in      *UpdateTaskInput
+		out     *UpdateTaskOutput
+		errcode codes.Code
+		ctx     context.Context
+		wantErr bool
+		setup   func(mockTaskRepo *mock.MockTaskRepository, mockAssigneeRepo *mock.MockTaskAssigneeRepository)
+	}{
+		{
+			name:    "success",
+			in:      in,
+			out:     out,
+			ctx:     ctx,
+			wantErr: false,
+			setup: func(mockTaskRepo *mock.MockTaskRepository, mockAssigneeRepo *mock.MockTaskAssigneeRepository) {
+				mockTaskRepo.EXPECT().GetTask(ctx, "task1").Return(task, nil)
+				mockTaskRepo.EXPECT().UpdateTask(ctx, task).Return(task, nil)
+			},
+		},
+		{
+			name:    "err: invalid",
+			in:      &UpdateTaskInput{},
+			errcode: codes.CodeInvalidArgument,
+			ctx:     ctx,
+			wantErr: true,
+		},
+		{
+			name:    "err: task not found",
+			in:      in,
+			out:     nil,
+			errcode: codes.CodeNotFound,
+			ctx:     context.Background(),
+			wantErr: true,
+			setup: func(mockTaskRepo *mock.MockTaskRepository, mockAssigneeRepo *mock.MockTaskAssigneeRepository) {
+				mockTaskRepo.EXPECT().GetTask(ctx, "task1").Return(nil, errors.New(codes.CodeNotFound))
+			},
+		},
+		{
+			name: "err: permission denied",
+			in: &UpdateTaskInput{
+				UserID:      "user2",
+				TaskID:      "task1",
+				Title:       "Updated Task",
+				Description: "This is an updated test task",
+				Status:      entity.TaskStatusInProgress.Int(),
+				DueDate:     nil},
+			out:     nil,
+			errcode: codes.CodePermissionDenied,
+			ctx:     ctx,
+			wantErr: true,
+			setup: func(mockTaskRepo *mock.MockTaskRepository, mockAssigneeRepo *mock.MockTaskAssigneeRepository) {
+				mockTaskRepo.EXPECT().GetTask(ctx, "task1").Return(task, nil)
+				mockAssigneeRepo.EXPECT().GetTaskAssignee(ctx, "task1", "user2").Return(nil, errors.New(codes.CodeNotFound))
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			mocks := newMocks(t)
+			u := newTaskUsecaseMock(mocks)
+			if tt.setup != nil {
+				tt.setup(mocks.tr, mocks.ar)
+			}
+
+			out, err := u.UpdateTask(tt.ctx, tt.in)
+			if tt.wantErr {
+				assert.Equal(t, tt.errcode, errors.Code(err))
+				return
+			}
+			assert.NoError(t, err)
+			assert.Equal(t, tt.out, out)
+		})
+	}
+}
+
+func TestTaskUsecase_DeleteTask(t *testing.T) {
+	t.Parallel()
+	ctx := context.Background()
+	in := &DeleteTaskInput{
+		UserID: "user1",
+		TaskID: "task1",
+	}
+	task := &entity.Task{
+		ID:          "task1",
+		UserID:      "user1",
+		Title:       "Test Task",
+		Description: "This is a test task",
+		Status:      entity.TaskStatusTodo,
+		DueDate:     nil,
+	}
+	tests := []struct {
+		name    string
+		in      *DeleteTaskInput
+		errcode codes.Code
+		ctx     context.Context
+		wantErr bool
+		setup   func(mockTaskRepo *mock.MockTaskRepository, mockAssigneeRepo *mock.MockTaskAssigneeRepository)
+	}{
+		{
+			name:    "success",
+			in:      in,
+			ctx:     ctx,
+			wantErr: false,
+			setup: func(mockTaskRepo *mock.MockTaskRepository, mockAssigneeRepo *mock.MockTaskAssigneeRepository) {
+				mockTaskRepo.EXPECT().GetTask(ctx, "task1").Return(task, nil)
+				mockTaskRepo.EXPECT().DeleteTask(ctx, "task1").Return(nil)
+			},
+		},
+		{
+			name:    "err: invalid",
+			in:      &DeleteTaskInput{},
+			errcode: codes.CodeInvalidArgument,
+			ctx:     ctx,
+			wantErr: true,
+		},
+		{
+			name:    "err: task not found",
+			in:      in,
+			errcode: codes.CodeNotFound,
+			ctx:     context.Background(),
+			wantErr: true,
+			setup: func(mockTaskRepo *mock.MockTaskRepository, mockAssigneeRepo *mock.MockTaskAssigneeRepository) {
+				mockTaskRepo.EXPECT().GetTask(ctx, "task1").Return(nil, errors.New(codes.CodeNotFound))
+			},
+		},
+		{
+			name: "err: permission denied",
+			in: &DeleteTaskInput{
+				UserID: "user2",
+				TaskID: "task1",
+			},
+			errcode: codes.CodePermissionDenied,
+			ctx:     ctx,
+			wantErr: true,
+			setup: func(mockTaskRepo *mock.MockTaskRepository, mockAssigneeRepo *mock.MockTaskAssigneeRepository) {
+				mockTaskRepo.EXPECT().GetTask(ctx, "task1").Return(task, nil)
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			mocks := newMocks(t)
+			u := newTaskUsecaseMock(mocks)
+			if tt.setup != nil {
+				tt.setup(mocks.tr, mocks.ar)
+			}
+
+			err := u.DeleteTask(tt.ctx, tt.in)
+			if tt.wantErr {
+				assert.Equal(t, tt.errcode, errors.Code(err))
+				return
+			}
+			assert.NoError(t, err)
 		})
 	}
 }

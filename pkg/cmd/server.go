@@ -96,8 +96,9 @@ func initServer(cfg *Config) (*server, func(), error) {
 	ur := repository.NewUserRepository(db)
 	tr := repository.NewTaskRepository(db)
 	ar := repository.NewTaskAssigneeRepository(db)
+	txr := repository.NewTransactionRepository(db)
 	au := usecase.NewAuthUsecase(ur, cfg.JWTSecret, cfg.TokenExpiry)
-	tu := usecase.NewTaskUsecase(tr, ar)
+	tu := usecase.NewTaskUsecase(tr, ar, txr)
 	h := handler.NewHandler(au, tu)
 	sh := handler.NewSecurityHandler(cfg.JWTSecret, ur)
 

@@ -36,8 +36,10 @@ func TestTaskRepository_CRUD(t *testing.T) {
 		DueDate:     nil,
 	}
 
-	err = taskRepo.CreateTask(ctx, task)
+	createdTask, err := taskRepo.CreateTask(ctx, task)
 	require.NoError(t, err)
+	require.NotNil(t, createdTask)
+	require.Equal(t, "task1", createdTask.ID)
 
 	// Get task
 	task, err = taskRepo.GetTask(ctx, "task1")
@@ -47,8 +49,10 @@ func TestTaskRepository_CRUD(t *testing.T) {
 
 	// Update task
 	task.Title = "Updated Test Task"
-	err = taskRepo.UpdateTask(ctx, task)
+	updatedTask, err := taskRepo.UpdateTask(ctx, task)
 	require.NoError(t, err)
+	require.NotNil(t, updatedTask)
+	require.Equal(t, "Updated Test Task", updatedTask.Title)
 
 	// Get task after update
 	task, err = taskRepo.GetTask(ctx, "task1")

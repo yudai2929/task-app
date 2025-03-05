@@ -40,3 +40,10 @@ func (ts TaskStatus) Int() int {
 }
 
 type Tasks []*Task
+
+func (t *Task) Update(title, description string, status TaskStatus, dueDate *time.Time) {
+	t.Title = title
+	t.Description = description
+	t.Status = status
+	t.DueDate = dueDate
+}

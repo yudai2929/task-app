@@ -108,6 +108,20 @@ func (mr *MockTaskUsecaseMockRecorder) CreateTask(ctx, in any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateTask", reflect.TypeOf((*MockTaskUsecase)(nil).CreateTask), ctx, in)
 }
 
+// DeleteTask mocks base method.
+func (m *MockTaskUsecase) DeleteTask(ctx context.Context, in *usecase.DeleteTaskInput) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteTask", ctx, in)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteTask indicates an expected call of DeleteTask.
+func (mr *MockTaskUsecaseMockRecorder) DeleteTask(ctx, in any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteTask", reflect.TypeOf((*MockTaskUsecase)(nil).DeleteTask), ctx, in)
+}
+
 // GetTask mocks base method.
 func (m *MockTaskUsecase) GetTask(ctx context.Context, in *usecase.GetTaskInput) (*usecase.GetTaskOutput, error) {
 	m.ctrl.T.Helper()
@@ -136,4 +150,19 @@ func (m *MockTaskUsecase) ListTasks(ctx context.Context, in *usecase.ListTasksIn
 func (mr *MockTaskUsecaseMockRecorder) ListTasks(ctx, in any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListTasks", reflect.TypeOf((*MockTaskUsecase)(nil).ListTasks), ctx, in)
+}
+
+// UpdateTask mocks base method.
+func (m *MockTaskUsecase) UpdateTask(ctx context.Context, in *usecase.UpdateTaskInput) (*usecase.UpdateTaskOutput, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateTask", ctx, in)
+	ret0, _ := ret[0].(*usecase.UpdateTaskOutput)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateTask indicates an expected call of UpdateTask.
+func (mr *MockTaskUsecaseMockRecorder) UpdateTask(ctx, in any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateTask", reflect.TypeOf((*MockTaskUsecase)(nil).UpdateTask), ctx, in)
 }

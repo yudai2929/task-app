@@ -16,10 +16,10 @@ type UserRepository interface {
 
 type TaskRepository interface {
 	GetTask(ctx context.Context, id string) (*entity.Task, error)
-	CreateTask(ctx context.Context, task *entity.Task) error
+	CreateTask(ctx context.Context, task *entity.Task) (*entity.Task, error)
 	ListTasks(ctx context.Context) (entity.Tasks, error)
 	ListMyTasks(ctx context.Context, userID string) (entity.Tasks, error)
-	UpdateTask(ctx context.Context, task *entity.Task) error
+	UpdateTask(ctx context.Context, task *entity.Task) (*entity.Task, error)
 	DeleteTask(ctx context.Context, id string) error
 }
 
@@ -27,4 +27,8 @@ type TaskAssigneeRepository interface {
 	BatchCreate(ctx context.Context, assignees entity.TaskAssignees) error
 	BatchDeleteByTaskID(ctx context.Context, taskID string) error
 	GetTaskAssignee(ctx context.Context, taskID, userID string) (*entity.TaskAssignee, error)
+}
+
+type TransactionRepository interface {
+	Run(ctx context.Context, fn func(ctx context.Context) error) error
 }

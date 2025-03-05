@@ -27,21 +27,24 @@ func newTaskUsecaseMock(mocks *mocks) *taskUsecase {
 		uuid:     func() string { return "uuid" },
 		tr:       mocks.tr,
 		ar:       mocks.ar,
+		txr:      mocks.txr,
 		validate: validator.New(),
 	}
 }
 
 type mocks struct {
-	ur *mock.MockUserRepository
-	tr *mock.MockTaskRepository
-	ar *mock.MockTaskAssigneeRepository
+	ur  *mock.MockUserRepository
+	tr  *mock.MockTaskRepository
+	ar  *mock.MockTaskAssigneeRepository
+	txr *mock.MockTransactionRepository
 }
 
 func newMocks(t *testing.T) *mocks {
 	ctrl := gomock.NewController(t)
 	return &mocks{
-		ur: mock.NewMockUserRepository(ctrl),
-		tr: mock.NewMockTaskRepository(ctrl),
-		ar: mock.NewMockTaskAssigneeRepository(ctrl),
+		ur:  mock.NewMockUserRepository(ctrl),
+		tr:  mock.NewMockTaskRepository(ctrl),
+		ar:  mock.NewMockTaskAssigneeRepository(ctrl),
+		txr: mock.NewMockTransactionRepository(ctrl),
 	}
 }

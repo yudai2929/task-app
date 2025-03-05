@@ -108,11 +108,12 @@ func (m *MockTaskRepository) EXPECT() *MockTaskRepositoryMockRecorder {
 }
 
 // CreateTask mocks base method.
-func (m *MockTaskRepository) CreateTask(ctx context.Context, task *entity.Task) error {
+func (m *MockTaskRepository) CreateTask(ctx context.Context, task *entity.Task) (*entity.Task, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateTask", ctx, task)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret0, _ := ret[0].(*entity.Task)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // CreateTask indicates an expected call of CreateTask.
@@ -181,11 +182,12 @@ func (mr *MockTaskRepositoryMockRecorder) ListTasks(ctx any) *gomock.Call {
 }
 
 // UpdateTask mocks base method.
-func (m *MockTaskRepository) UpdateTask(ctx context.Context, task *entity.Task) error {
+func (m *MockTaskRepository) UpdateTask(ctx context.Context, task *entity.Task) (*entity.Task, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateTask", ctx, task)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret0, _ := ret[0].(*entity.Task)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // UpdateTask indicates an expected call of UpdateTask.
@@ -258,4 +260,41 @@ func (m *MockTaskAssigneeRepository) GetTaskAssignee(ctx context.Context, taskID
 func (mr *MockTaskAssigneeRepositoryMockRecorder) GetTaskAssignee(ctx, taskID, userID any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTaskAssignee", reflect.TypeOf((*MockTaskAssigneeRepository)(nil).GetTaskAssignee), ctx, taskID, userID)
+}
+
+// MockTransactionRepository is a mock of TransactionRepository interface.
+type MockTransactionRepository struct {
+	ctrl     *gomock.Controller
+	recorder *MockTransactionRepositoryMockRecorder
+}
+
+// MockTransactionRepositoryMockRecorder is the mock recorder for MockTransactionRepository.
+type MockTransactionRepositoryMockRecorder struct {
+	mock *MockTransactionRepository
+}
+
+// NewMockTransactionRepository creates a new mock instance.
+func NewMockTransactionRepository(ctrl *gomock.Controller) *MockTransactionRepository {
+	mock := &MockTransactionRepository{ctrl: ctrl}
+	mock.recorder = &MockTransactionRepositoryMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockTransactionRepository) EXPECT() *MockTransactionRepositoryMockRecorder {
+	return m.recorder
+}
+
+// Run mocks base method.
+func (m *MockTransactionRepository) Run(ctx context.Context, fn func(context.Context) error) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Run", ctx, fn)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Run indicates an expected call of Run.
+func (mr *MockTransactionRepositoryMockRecorder) Run(ctx, fn any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Run", reflect.TypeOf((*MockTransactionRepository)(nil).Run), ctx, fn)
 }

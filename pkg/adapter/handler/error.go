@@ -12,7 +12,7 @@ func (h *Handler) NewError(ctx context.Context, err error) *api.ErrorStatusCode 
 
 	sc := code.HTTPStatus()
 	msg := code.String()
-	if code.HTTPStatus() < 500 {
+	if code.HTTPStatus() == 400 || code.HTTPStatus() == 401 {
 		msg = err.Error()
 	}
 	return &api.ErrorStatusCode{

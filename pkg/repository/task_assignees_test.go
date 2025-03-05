@@ -42,7 +42,7 @@ func TestTaskAssigneeRepository_CRUD(t *testing.T) {
 		Status:      entity.TaskStatusTodo,
 		DueDate:     nil,
 	}
-	err = taskRepo.CreateTask(ctx, task)
+	_, err = taskRepo.CreateTask(ctx, task)
 	require.NoError(t, err)
 
 	// Create task assignees

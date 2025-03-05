@@ -54,11 +54,32 @@ func (h *Handler) CreateTask(ctx context.Context, req *api.CreateTaskReq) (*api.
 }
 
 func (h *Handler) UpdateTask(ctx context.Context, req *api.UpdateTaskReq, params api.UpdateTaskParams) (*api.Task, error) {
-	return nil, nil
+	userID := UserIDFromContext(ctx)
+
+	dueDate := req.GetDueDate().Value
+	in := &usecase.UpdateTaskInput{
+		UserID:      userID,
+		TaskID:      params.ID,
+		Title:       req.GetTitle(),
+		Description: req.GetDescription(),
+		Status:      req.GetStatus(),
+		DueDate:     &dueDate,
+	}
+	out, err := h.tu.UpdateTask(ctx, in)
+	if err != nil {
+		return nil, err
+	}
+
+	return h.convertToAPITask(out.Task), nil
 }
 
 func (h *Handler) DeleteTask(ctx context.Context, params api.DeleteTaskParams) error {
-	return nil
+	userID := UserIDFromContext(ctx)
+	in := &usecase.DeleteTaskInput{
+		UserID: userID,
+		TaskID: params.ID,
+	}
+	return h.tu.DeleteTask(ctx, in)
 }
 
 func (h *Handler) AssignTask(ctx context.Context, req *api.AssignTaskReq, params api.AssignTaskParams) error {
