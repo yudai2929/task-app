@@ -10,6 +10,7 @@ import (
 )
 
 func TestGenerate(t *testing.T) {
+	t.Parallel()
 	secret := "secret"
 	userID := "user123"
 	expiry := time.Hour
@@ -39,6 +40,7 @@ func TestGenerate(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			token, err := Generate(tt.userID, tt.secret, tt.expiry)
 			if tt.wantErr {
 				assert.Error(t, err)
@@ -51,6 +53,7 @@ func TestGenerate(t *testing.T) {
 }
 
 func TestValidateToken(t *testing.T) {
+	t.Parallel()
 	secret := "secret"
 	userID := "user123"
 	expiry := time.Hour
@@ -91,6 +94,7 @@ func TestValidateToken(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			claims, err := Validate(tt.token, tt.secret)
 			if tt.wantErr {
 				assert.Error(t, err)

@@ -12,6 +12,7 @@ import (
 )
 
 func TestTaskUsecase_CreateTask(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 	in := &CreateTaskInput{
 		UserID:      "user1",
@@ -71,6 +72,7 @@ func TestTaskUsecase_CreateTask(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			mocks := newMocks(t)
 			u := newTaskUsecaseMock(mocks)
 			if tt.setup != nil {
@@ -89,6 +91,7 @@ func TestTaskUsecase_CreateTask(t *testing.T) {
 }
 
 func TestTaskUsecase_GetTask(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 	in := &GetTaskInput{
 		UserID: "user1",
@@ -173,6 +176,7 @@ func TestTaskUsecase_GetTask(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			mocks := newMocks(t)
 			u := newTaskUsecaseMock(mocks)
 			if tt.setup != nil {
@@ -191,6 +195,7 @@ func TestTaskUsecase_GetTask(t *testing.T) {
 }
 
 func TestTaskUsecase_ListTasks(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 	in := &ListTasksInput{
 		UserID: "user1",
@@ -255,6 +260,7 @@ func TestTaskUsecase_ListTasks(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			mocks := newMocks(t)
 			u := newTaskUsecaseMock(mocks)
 			if tt.setup != nil {

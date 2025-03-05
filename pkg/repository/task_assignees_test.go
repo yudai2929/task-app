@@ -9,6 +9,7 @@ import (
 )
 
 func TestTaskAssigneeRepository_CRUD(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 	taskAssigneeRepo := NewTaskAssigneeRepository(db)
 	taskRepo := NewTaskRepository(db)
