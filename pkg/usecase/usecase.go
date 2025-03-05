@@ -3,7 +3,7 @@ package usecase
 import "context"
 
 //go:generate mkdir -p mock
-//go:generate mockgen -package=mock -source=./repository.go -destination=./mock/mock.go
+//go:generate mockgen -package=mock -source=./usecase.go -destination=./mock/mock.go
 type AuthUsecase interface {
 	Login(ctx context.Context, in *LoginInput) (*LoginOutput, error)
 	SignUp(ctx context.Context, in *SignUpInput) (*SignUpOutput, error)
