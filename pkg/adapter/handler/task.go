@@ -14,11 +14,11 @@ func (h *Handler) ListTasks(ctx context.Context) ([]api.Task, error) {
 	return nil, nil
 }
 
-func (h *Handler) CreateTask(ctx context.Context, req *api.Task) (*api.Task, error) {
+func (h *Handler) CreateTask(ctx context.Context, req *api.CreateTaskReq) (*api.Task, error) {
 	return nil, nil
 }
 
-func (h *Handler) UpdateTask(ctx context.Context, req *api.Task, params api.UpdateTaskParams) (*api.Task, error) {
+func (h *Handler) UpdateTask(ctx context.Context, req *api.UpdateTaskReq, params api.UpdateTaskParams) (*api.Task, error) {
 	return nil, nil
 }
 
